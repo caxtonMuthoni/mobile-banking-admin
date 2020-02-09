@@ -1,0 +1,197 @@
+
+
+/*------------------------- 1. Core Css -------------------*/
+
+.page-container {
+    width: 100%;
+    height: 100%;
+    min-height: 100vh;
+    padding-left: 280px;
+    -webkit-transition: padding-left 0.3s ease 0s;
+    transition: padding-left 0.3s ease 0s;
+}
+
+.sbar_collapsed.page-container {
+    padding-left: 0;
+}
+
+.card {
+    border: none;
+    border-radius: 4px;
+    background-color: #fff;
+    -webkit-transition: all 0.3s ease 0s;
+    transition: all 0.3s ease 0s;
+}
+
+.card:hover {
+    box-shadow: 0 5px 30px rgba(0, 0, 0, 0.02);
+}
+
+.card-body {
+    padding: 25.6px;
+    padding: 1.6rem;
+}
+
+.h-full {
+    height: 100%;
+}
+
+.main-content {
+    width: 100%;
+    background: #F3F8FB;
+}
+
+.main-content-inner {
+    padding: 0 30px 50px;
+}
+
+/*------------------------- END Core Css -------------------*/
+.my-nav{
+    z-index: 1000;
+    background: rgb(0,0,0);
+background: linear-gradient(116deg, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 0%, rgb(30, 94, 233) 0%, rgba(135,210,210,1) 39%, rgba(46,203,172,1) 81%);
+    }
+
+/*-------------------- 2.1 Sidebar Menu -------------------*/
+
+.sidebar-menu {
+    position: fixed;
+    margin-top: 50px;
+    left: 0;
+    top: 0;
+    z-index: 99;
+    height: 100vh;
+    align-items: center;
+    width: 280px;
+    background: #f7f7f7;
+    -webkit-box-shadow: 2px 3px 3px 0px rgba(107,97,107,1);
+    -moz-box-shadow: 2px 3px 3px 0px rgba(107,97,107,1);
+    box-shadow: 2px 3px 3px 0px rgba(107,97,107,1);
+
+}
+
+.sbar_collapsed .sidebar-menu {
+    left: -280px;
+}
+
+.main-menu {
+    height: calc(100% - 100px);
+    padding: 20px 10px 0 0;
+}
+
+.menu-inner {
+    margin-left: 20px;
+    height: 100%;
+}
+
+.slimScrollBar {
+    background: #fff!important;
+    opacity: 0.1!important;
+}
+
+.sidebar-header {
+    padding: 19px 32px 20px;
+    background: #f3f6fc;
+    border-bottom: 1px solid #696d75;
+}
+.sidebar-menu .logo{
+    text-align: center;
+}
+.logo a {
+    display: inline-block;
+    max-width: 120px;
+}
+
+.metismenu >li >a {
+    padding-left: 32px!important;
+}
+.metismenu li a {
+    position: relative;
+    display: block;
+    color: #8d97ad;
+    font-size: 15px;
+    text-transform: capitalize;
+    padding: 15px 15px;
+    letter-spacing: 0;
+    font-weight: 400;
+}
+
+.metismenu li a i {
+    color: #6a56a5;
+    -webkit-transition: all 0.3s ease 0s;
+    transition: all 0.3s ease 0s;
+}
+
+.metismenu li a:after {
+    position: absolute;
+    content: '\f107';
+    font-family: fontawesome;
+    right: 15px;
+    top: 12px;
+    color: #8d97ad;
+    font-size: 20px;
+}
+
+.metismenu li a i .active{
+    color: #6a6;
+}
+
+.metismenu li.active>a:after {
+    content: '\f106';
+}
+
+.metismenu li a:only-child:after {
+    content: '';
+}
+
+.metismenu li a span {
+    margin-left: 20px;
+}
+
+.metismenu li.active>a,
+.metismenu li:hover>a {
+    color: #2d2d2d;
+}
+
+.metismenu li li a {
+    padding: 8px 20px;
+}
+
+.metismenu li ul {
+    padding-left: 3px;
+}
+
+.metismenu >li:hover>a,
+.metismenu >li.active>a {
+    color: #6a56a5;
+   
+    
+}
+
+.metismenu li:hover>a,
+.metismenu li.active>a {
+    color: #6a56a5;
+}
+
+.metismenu li:hover>a i,
+.metismenu li.active>a i {
+    color: #66aa55;
+}
+
+.metismenu li li a:after {
+    top: 6px;
+}
+
+/*-------------------- END Sidebar Menu -------------------*/
+
+
+.footer-area {
+    text-align: center;
+    padding: 23px 0 19px;
+    background: #fff;
+}
+
+.footer-area p {
+    color: #676666;
+    margin-bottom: 0;
+}

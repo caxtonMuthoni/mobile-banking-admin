@@ -1,0 +1,270 @@
+/* =================================
+------------------------------------
+  Cryptocurrency - Landing Page
+  Version: 1.0
+ ------------------------------------ 
+ ====================================*/
+
+
+
+/*----------------------------------------*/
+/* Template default CSS
+/*----------------------------------------*/
+
+@font-face {
+	font-family: 'Futura';
+	src: url("/fonts/Futura.woff");
+}
+
+h1,
+h2
+ {
+	color: #20509e;
+	margin: 0;
+	font-weight: 500;
+	font-family: "Futura", sans-serif;
+}
+
+h1 {
+	font-size: 70px;
+}
+
+h2 {
+	font-size: 48px;
+}
+
+h3 {
+	font-size: 30px;
+}
+
+h4 {
+	font-size: 24px;
+}
+
+h5 {
+	font-size: 20px;
+}
+
+h6 {
+	font-size: 14px;
+}
+
+.hero-text p {
+	font-size: 15.7px;
+	color: #75849a;
+	line-height: 1.6;
+}
+
+.phome{
+ color: rgb(227, 247, 253);
+ font-weight: bold;
+}
+
+img {
+	max-width: 100%;
+}
+
+input:focus,
+select:focus,
+button:focus,
+textarea:focus {
+	outline: none;
+}
+
+a:hover,
+a:focus {
+	text-decoration: none;
+	outline: none;
+}
+
+ul,
+ol {
+	padding: 0;
+	margin: 0;
+}
+
+
+/*---------------------
+	Commom elements
+-----------------------*/
+
+/* Buttons */
+
+.site-btn {
+	position: relative;
+	display: inline-block;
+	padding: 15px 30px;
+	font-size: 16px;
+	font-weight: 500;
+	line-height: 16px;
+	border-radius: 50px;
+	font-family: "Futura", sans-serif;
+	min-width: 170px;
+	text-align: center;
+	border: 2px solid #7ad4cc;
+	cursor: pointer;
+	color: #fff;
+}
+
+.site-btn:hover {
+	color: #fff;
+}
+
+.site-btn.no-radius {
+	border-radius: 2px;
+}
+
+.site-btn.sb-full-- {
+	display: block;
+	width: 100%;
+	border-radius: 0;
+}
+
+.site-btn.sb-gradients {
+	padding: 17px 32px;
+	border: none;
+	color: #fff;
+}
+
+.site-btn.sb-gradients.sbg-line {
+	color: #20509e;
+	z-index: 1;
+}
+
+.site-btn.sb-gradients.sbg-line:after {
+	position: absolute;
+	content: '';
+	width: calc(100% - 4px);
+	height: calc(100% - 4px);
+	background: #fff;
+	top: 2px;
+	left: 2px;
+	z-index: -1;
+	border-radius: 50px;
+}
+
+.site-btn.sb-gradients.sbg-line:hover {
+	color: #20509e;
+}
+
+.gradient-bg,
+.site-btn.sb-gradients,
+.member-social a:hover,
+.single-blog-page .social-share a:hover,
+.comment .comment-content .c-btn:hover,
+.comment-form label {
+	/* FF3.6-15 */
+	/* Chrome10-25,Safari5.1-6 */
+	background: -webkit-gradient(linear, left top, right top, from(#3e2bce), color-stop(100%, #2dd3aa), color-stop(100%, #2dd3aa), to(#2dd3aa));
+	background: -o-linear-gradient(left, #3e2bce 0%, #2dd3aa 100%, #2dd3aa 100%, #2dd3aa 100%);
+	background: linear-gradient(to right, #3e2bce 0%, #2dd3aa 100%, #2dd3aa 100%, #2dd3aa 100%);
+	/* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#3e2bce', endColorstr='#2dd3aa', GradientType=1);
+	/* IE6-9 */
+}
+
+
+/*---------------------
+	Header section
+-----------------------*/
+
+.header-section {
+	position: absolute;
+	width: 100%;
+	top: 0;
+	padding: 3px 50px 0;
+	z-index: 99;
+}
+
+.header-section .site-btn {
+	float: right;
+	margin-left: 60px;
+}
+
+.header-section .responsive-bar,
+.header-section .user {
+	display: none;
+}
+
+.main-menu {
+	float: right;
+}
+
+.menu-list {
+	list-style: none;
+}
+
+.menu-list li {
+	display: inline;
+}
+
+.menu-list li a {
+	display: inline-block;
+	font-family: "Futura", sans-serif;
+	font-size: 16px;
+	padding: 10px 5px;
+	margin-right: 30px;
+	color: #fff;
+}
+
+/*---------------------
+	Hero Section
+-----------------------*/
+
+.hero-section {
+	height: 650px;
+	padding-top: 100px;
+	display: block;
+	background-image: url("/images/hero-bg.png");
+	background-size: cover;
+	background-color: #f3f7f9;
+	background-position: right top;
+	background-repeat: no-repeat;
+	position: relative;
+	overflow: hidden;
+}
+
+.hero-section .laptop-image {
+	width: 685px;
+	max-width: none;
+	position: relative;
+	left: 80px;
+}
+
+.hero-text {
+	padding-top: 60px;
+}
+
+.hero-text h2 {
+	font-size: 70px;
+	margin-bottom: 35px;
+}
+
+.hero-text h2 span {
+	color: #16d0c5;
+}
+
+.hero-text h4 {
+	color: #75849a;
+	font-size: 22px;
+}
+
+.hero-subscribe-from {
+	margin-top: 50px;
+	display: block;
+}
+
+.hero-subscribe-from input {
+	width: 315px;
+	border: 1px solid #ebebeb;
+	background: #fff;
+	height: 48px;
+	padding: 0 25px;
+	border-radius: 50px;
+	font-family: "Futura", sans-serif;
+	font-size: 16px;
+	margin-right: 8px;
+	margin-bottom: 20px;
+}
+
+

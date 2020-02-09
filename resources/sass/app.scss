@@ -1,0 +1,27 @@
+// Fonts
+@import url('https://fonts.googleapis.com/css?family=Nunito');
+
+// Variables
+@import 'variables';
+
+
+// Variables
+@import 'styles';
+
+// adimlte
+@import '~admin-lte/dist/css/adminlte.css';
+
+@import '~@fortawesome/fontawesome-free/css/all.css';
+@import '~@fortawesome/fontawesome-free/css/fontawesome.css';
+@import '~@fortawesome/fontawesome-free/css/solid.css';
+@import '~@fortawesome/fontawesome-free/css/brands.css';
+
+// Bootstrap
+@import '~bootstrap/scss/bootstrap';
+
+.router-link-exact-active{
+	color: #ffffff !important;
+    background-color: #3f51b5;
+    border-color: #3f51b5;
+}
+
