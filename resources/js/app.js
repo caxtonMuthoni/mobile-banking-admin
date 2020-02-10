@@ -53,6 +53,10 @@ Vue.filter('upDate',function(myDate){
   return moment(myDate).format('MMMM Do YYYY');
 })
 
+Vue.filter('time',function(time){
+  return moment(time).calendar()
+});
+
 
 import VueProgressBar from 'vue-progressbar'
 
@@ -72,8 +76,18 @@ Vue.use(VueRouter)
 const routes = [
     { path: '/home', component: require('./components/Home.vue').default },
      { path: '/example', component: require('./components/ExampleComponent.vue').default } ,
-     {path: '/manageusers',component: require('./components/manageUsers.vue').default },
-     {path: '/accounts',component: require('./components/Account/accounts.vue').default }
+     /* Users */
+     {path: '/manageusers',component: require('./components/User/manageUsers.vue').default },
+     {path: '/users',component: require('./components/User/users.vue').default },
+        /* =========Account============ */
+     {path: '/accounts',component: require('./components/Account/accounts.vue').default },
+     {path: '/topup',component: require('./components/Account/deposit.vue').default },
+
+     {path: '/profile',component: require('./components/Profile/profile.vue').default },
+
+     /* transcation */
+     {path: '/transactions',component: require('./components/Transaction/transactions.vue').default },
+    
 
   ]
 

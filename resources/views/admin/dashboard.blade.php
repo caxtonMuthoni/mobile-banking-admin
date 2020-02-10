@@ -153,7 +153,7 @@
           <img src="{{asset('dist/img/user2-160x160.jpg')}}" class="img-circle elevation-2" alt="User Image">
         </div>
         <div class="info">
-          <a href="#" class="d-block">{{Auth::user()->FirstName}}  {{Auth::user()->LastName}}</a>
+          <router-link to="/profile" class="d-block">{{Auth::user()->FirstName}}  {{Auth::user()->LastName}}</router-link>
         </div>
       </div>
 
@@ -193,14 +193,14 @@
               <li class="nav-item">
                 <router-link to="/accounts" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>OpenAccount</p>
+                  <p>Accounts</p>
                 </router-link>
               </li>
               <li class="nav-item">
-                <a href="pages/layout/top-nav.html" class="nav-link">
+                <router-link to="/topup" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>Deposit</p>
-                </a>
+                  <p>Top Up My Account</p>
+                </router-link >
               </li>
               <li class="nav-item">
                 <a href="pages/layout/top-nav.html" class="nav-link">
@@ -263,10 +263,10 @@
             </a>
             <ul class="nav nav-treeview">
             <li class="nav-item">
-                <a href="pages/UI/icons.html" class="nav-link">
+                <router-link to="/users" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
                   <p>View</p>
-                </a>
+                </router-link>
               </li>
               <li class="nav-item">
                 <router-link to="/manageusers" class="nav-link">
@@ -310,15 +310,9 @@
             </a>
             <ul class="nav nav-treeview">
               <li class="nav-item">
-                <a href="pages/tables/simple.html" class="nav-link">
+                <router-link to="/transactions" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>Deposits</p>
-                </a>
-              </li>
-              <li class="nav-item">
-                <router-link to="/test" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Withdrawals</p>
+                  <p>Transactions</p>
                 </router-link>
               </li>
               <li class="nav-item">

@@ -19,7 +19,8 @@ class AccountController extends Controller
      */
     public function index()
     {
-        //
+        $accunts = Account::all();
+        return $accunts;
     }
 
     /**
@@ -77,13 +78,11 @@ class AccountController extends Controller
     }
     
     public function STKPush(Request $request){
-        $valitator = Validator::make($request->all(),[
+        $this->validate($request,[
             "PhoneNumber"=>"required | max:10 | min:10 | regex:/(07)[0-9]{8}/",
 	        "Amount"=> "required | numeric",
         ]);
-        if($valitator->fails()){
-            return $valitator->errors();
-        }
+        
         $phone = $request->PhoneNumber;
         $PhoneNumber = "+254".substr($phone,1);
         $username = "caxton";
@@ -423,16 +422,74 @@ class AccountController extends Controller
         curl_close($ch);
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Account  $account
-     * @return \Illuminate\Http\Response
-     */
-    public function show(Account $account)
+   
+    public function directDeposit(Request $request)
     {
-        //
+        //Validation
+        $this->validate($request,[
+            'id'=>"required | numeric",
+            'AccountNumber'=>"required | numeric",
+            'CurrentBal'=>"required | numeric",
+        ]);
+
+        $accountToDeposit = Account::where('AccountNumber',$request->AccountNumber)->first();
+        $myBalance = $accountToDeposit->CurrentBalance;
+        $user = User::where('id',$accountToDeposit->CustomerID)->first();
+        $accountToDeposit->CurrentBalance = $accountToDeposit->CurrentBalance + $request->CurrentBal;
+        if($accountToDeposit->save()){
+                $transaction = new Transaction;
+                $transaction->TransactionType = "Direct deposit by ".auth('api')->user()->FirstName.auth('api')->user()->NationalID;
+                $transaction->TransID = rand(100000,999999);
+                $transaction->TransAmount = $request->CurrentBal;
+                $transaction->Account = $request->id;
+                $transaction->MSISDN = auth('api')->user()->PhoneNumber;
+                $transaction->FirstName = $user->FirstName;
+                $transaction->MiddleName = $user->MiddleName;
+                $transaction->LastName = $user->LastName;
+                $transaction->OrgAccountBalance = $myBalance;
+                $transaction->CrtAccountBalance = $myBalance + $request->CurrentBal;
+                if($transaction->save()){
+                    return response()->json([
+                        'status'=>'true',
+                        "success"=>'deposit proccessed successfully !!!',
+                    ]);
+                }
+        }
     }
+
+    public function directWithdraw(Request $request)
+    {
+        //Validation
+        $this->validate($request,[
+            'AccountNumber'=>"required | numeric",
+            'CurrentBal'=>"required | numeric",
+        ]);
+
+        $accountToDeposit = Account::where('AccountNumber',$request->AccountNumber)->first();
+        $myBalance = $accountToDeposit->CurrentBalance;
+        $user = User::where('id',$accountToDeposit->CustomerID)->first();
+        $accountToDeposit->CurrentBalance = $accountToDeposit->CurrentBalance - $request->CurrentBal;
+        if($accountToDeposit->save()){
+                $transaction = new Transaction;
+                $transaction->TransactionType = "Direct withdraw by ".auth('api')->user()->FirstName.auth('api')->user()->NationalID;
+                $transaction->TransID = rand(100000,999999);
+                $transaction->TransAmount = $request->CurrentBal;
+                $transaction->Account = $request->id;
+                $transaction->MSISDN = auth('api')->user()->PhoneNumber;
+                $transaction->FirstName = $user->FirstName;
+                $transaction->MiddleName = $user->MiddleName;
+                $transaction->LastName = $user->LastName;
+                $transaction->OrgAccountBalance = $myBalance;
+                $transaction->CrtAccountBalance = $myBalance - $request->CurrentBal;
+                if($transaction->save()){
+                    return response()->json([
+                        'status'=>'true',
+                        "success"=>'withdrawal proccessed successfully !!!',
+                    ]);
+                }
+        }
+    }
+
 
    
     public function openAccount(Request $request)

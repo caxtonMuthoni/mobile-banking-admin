@@ -11,6 +11,10 @@ use Auth;
 class BorrowController extends Controller
 {
     
+    public function myBorrows(){
+        $userLoans = Borrow::where('userId',auth('api')->user()->id)->latest()->paginate(10);
+        return $userLoans;
+    }
     public function index()
     {
         $borrows = Borrow::all();

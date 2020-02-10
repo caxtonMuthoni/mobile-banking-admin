@@ -26,8 +26,7 @@ Route::group([
     Route::group([
       'middleware' => 'auth:api'
     ], function() {
-        Route::get('logout', 'AuthController@logout');
-        Route::get('user', 'AuthController@user');    
+        Route::get('logout', 'AuthController@logout'); 
     });
 });
 
@@ -40,14 +39,18 @@ Route::group([
     Route::get('userscount', 'AuthController@usersCount');
     Route::delete('delete/{id}', 'AuthController@destroy');
     Route::post('updateuser/{id}', 'AuthController@updateUser');
+    Route::get('user', 'AuthController@loadUser');   
 
     /* Account */
+    Route::get('accounts','AccountController@index'); 
     Route::get('balance','AccountController@checkBalance'); 
     Route::Post('stkpush','AccountController@STKPush'); 
     Route::Post('deposit','AccountController@deposit'); 
     Route::Post('withdraw','AccountController@withdraw');
     Route::Post('topupsap','AccountController@topUpSap'); 
-    Route::Post('openaccount','AccountController@openAccount'); 
+    Route::Post('openaccount','AccountController@openAccount');
+    Route::Post('directdeposit','AccountController@directDeposit');
+    Route::Post('directwithdraw','AccountController@directWithdraw'); 
 
     /* OTP */
     Route::Post('getotp','OTPController@generateOtp');
@@ -57,8 +60,16 @@ Route::group([
     Route::get('borrows','BorrowController@index'); 
     Route::get('userloans','BorrowController@getUserLoans');
     Route::get('useractiveloan','BorrowController@getUserActiveLoan');
+    Route::get('myborrows','BorrowController@myBorrows');
 
     /* Lend */
     Route::Post('lend','LendController@Lend');
     Route::Post('tranfercash','LendController@transferCash'); 
+
+    /* profile */
+    Route::post('saveprofile','ProfileController@store');
+    Route::get('show','ProfileController@show');
+
+    /* Transactions */
+    Route::get('trasactions','TransactionController@index');
   });

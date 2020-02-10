@@ -14,7 +14,8 @@ class TransactionController extends Controller
      */
     public function index()
     {
-        //
+        $transactions = Transaction::latest()->paginate(10);
+        return $transactions ;
     }
 
     /**

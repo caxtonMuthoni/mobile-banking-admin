@@ -149,4 +149,8 @@ class AuthController extends Controller
             ]);
         }
     }
+    public function loadUser(){
+        $user = auth('api')->user();
+        return $user;
+    }
 }
