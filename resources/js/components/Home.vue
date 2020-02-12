@@ -1,24 +1,7 @@
 <template>
     <div class="container">
         
- <!-- Content Header (Page header) -->
- <div class="content-header">
-      <div class="container-fluid">
-        <div class="row mb-2">
-          <div class="col-sm-6">
-            <h1 class="m-0 text-dark">Dashboard</h1>
-          </div><!-- /.col -->
-          <div class="col-sm-6">
-            <ol class="breadcrumb float-sm-right">
-              <li class="breadcrumb-item"><a href="/">Home</a></li>
-              <li class="breadcrumb-item active">Account stats</li>
-            </ol>
-          </div><!-- /.col -->
-        </div><!-- /.row -->
-      </div><!-- /.container-fluid -->
-    </div>
-    <!-- /.content-header -->
-<section class="content">
+<section class="content mt-3">
       <div class="container-fluid">
         <!-- Small boxes (Stat box) -->
         <div class="row">
@@ -27,9 +10,9 @@
            
             <div class="small-box bg-info">
               <div class="inner">
-                <h3>150</h3>
+                <h3>{{balance}}</h3>
 
-                <p class="phome">Balance</p>
+                <p class="phome">Balance at {{asAt | time}}</p>
               </div>
               <div class="icon">
                   <i class="fab fa-acquisitions-incorporated    "></i>
@@ -42,9 +25,9 @@
             <!-- small box -->
             <div class="small-box bg-success">
               <div class="inner">
-                <h3>53<sup style="font-size: 20px"></sup></h3>
+                <h3>{{loans}}<sup style="font-size: 20px"></sup></h3>
 
-                <p class="phome">Loan Balance</p>
+                <p class="phome">Loans</p>
               </div>
               <div class="icon">
                <i class="fab fa-creative-commons    "></i>
@@ -72,14 +55,14 @@
             <!-- small box -->
             <div class="small-box bg-danger">
               <div class="inner">
-                <h3>65</h3>
+                <h3>{{bal}}</h3>
 
-                <p class="phome">Bad debt</p>
+                <p class="phome">SMS Balance</p>
               </div>
               <div class="icon">
                <i class="fas fa-chart-bar    "></i>
               </div>
-              <a href="#" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+              <a href="#" class="small-box-footer">SMS Expediture : {{usage}}</a>
             </div>
           </div>
           <!-- ./col -->
@@ -112,7 +95,11 @@
                   <!-- Morris chart - Sales -->
                   <div class="chart tab-pane active" id="revenue-chart"
                        style="position: relative; height: 300px;">
-                      <canvas id="revenue-chart-canvas" height="300" style="height: 300px;"></canvas>                         
+        
+                     <div class="small">
+                      <h4>Reports</h4>
+                      <line-chart :chart-data="datacollection" :height="100"></line-chart>
+                    </div>                       
                    </div>
                   <div class="chart tab-pane" id="sales-chart" style="position: relative; height: 300px;">
                     <canvas id="sales-chart-canvas" height="300" style="height: 300px;"></canvas>                         
@@ -612,19 +599,57 @@
 </template>
 
 <script>
+import LineChart from './LineCharts.js'
     export default {
+      components: {
+          LineChart
+        },
         data(){
           return{
-            users:''
+            datacollection: {},
+            users:'',
+            loans:'',
+            usage:'',
+            bal:'',
+            balance:'',
+            asAt:''
           }
         },
+        mounted () {
+            this.fillData()
+          },
         methods:{
+           fillData (){
+                  this.datacollection = {
+                    labels: ['Lunes','Martes','Miercoles','Jueves','Viernes', 'Sabado' , 'Domingo'],
+                    datasets: [
+                      {
+                        label: 'Ventas',
+                        backgroundColor: '#9561e2',
+                        data: [ 20, 40, 50, 20, 50, 40]
+                      },
+                    ]
+                  }
+                },
+          getBalance(){
+            this.$Progress.start()
+           axios.get('api/balance').then(({data})=>{
+             this.balance = data.response.SAPWalletBalance;
+             this.asAt = data.response.Date;
+           })
+          },
           getUsersNumber(){
-            axios.get('/api/userscount').then(({data})=>(this.users=data))
+            axios.get('/api/userscount').then(({data})=>{
+              this.users=data;
+              this.loans=data.loans;
+              this.usage=data.usage;
+              this.bal = data.bal
+              })
           }
         },
         created() {
-            this.getUsersNumber()
+            this.getUsersNumber();
+            this.getBalance();
         }
     }
 </script>

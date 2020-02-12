@@ -166,16 +166,16 @@
             <router-link to="/home" class="nav-link">
               <i class="nav-icon fas fa-tachometer-alt cyan"></i>
               <p>
-                M~Baking Stats
+                M~Baking Dash
                 <i class="right fas fa-angle-left"></i>
               </p>
             </router-link>
           </li>
           <li class="nav-item">
-            <router-link to="/example" class="nav-link">
-              <i class="nav-icon fas fa-th indigo"></i>
+            <router-link to="/home" class="nav-link">
+             <i class="fas fa-chart-area  indigo  "></i>
               <p>
-                Account stats
+                System Stats
                 <span class="right badge badge-danger">New</span>
               </p>
             </router-link >
@@ -199,27 +199,22 @@
               <li class="nav-item">
                 <router-link to="/topup" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>Top Up My Account</p>
+                  <p>Top Up Wallets</p>
                 </router-link >
               </li>
               <li class="nav-item">
-                <a href="pages/layout/top-nav.html" class="nav-link">
+                <router-link to="/withdraw" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Withdraw</p>
-                </a>
+                </router-link>
               </li>
-              <li class="nav-item">
-                <a href="pages/layout/top-nav.html" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>MakePayments</p>
-                </a>
-              </li>
+              
 
               <li class="nav-item">
-                <a href="pages/layout/top-nav.html" class="nav-link">
+                <router-link to="/statement" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Request Statement</p>
-                </a>
+                </router-link>
               </li>
               
             </ul>
@@ -233,23 +228,23 @@
               </p>
             </a>
             <ul class="nav nav-treeview">
-              <li class="nav-item">
-                <a href="pages/charts/chartjs.html" class="nav-link">
+            <li class="nav-item">
+                <router-link to="/loans" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>Request Loan</p>
-                </a>
+                  <p>Loans</p>
+                </router-link>
               </li>
               <li class="nav-item">
-                <a href="pages/charts/flot.html" class="nav-link">
+                <router-link to="/activeloans" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>Check Limit</p>
-                </a>
+                  <p>Active Loans</p>
+                </router-link>
               </li>
               <li class="nav-item">
-                <a href="pages/charts/inline.html" class="nav-link">
+                <router-link to="/graph" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>Pay Loan</p>
-                </a>
+                  <p>Processed Loans</p>
+                </router-link>
               </li>
             </ul>
           </li>
@@ -360,6 +355,10 @@
 
 <!-- Scripts -->
 <script src="{{ asset('js/app.js') }}"></script>
+<!-- AdminLTE for demo purposes -->
+<script src="{{asset('dist/js/demo.js')}}"></script>
+<!-- ChartJS -->
+<script src="{{asset('plugins/chart.js/Chart.min.js')}}"></script>
 
 
 <script>

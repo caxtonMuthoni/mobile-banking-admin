@@ -38974,6 +38974,14 @@ readers do not read off random characters that represent icons */
   color: #6cb2eb;
 }
 
+.paymenttab li .active {
+  color: #9561e2 !important;
+}
+
+.paymenttab li a {
+  color: #f7f7f7;
+}
+
 /* =================================
 ------------------------------------
   Cryptocurrency - Landing Page

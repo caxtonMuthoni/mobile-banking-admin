@@ -59,7 +59,8 @@
         methods:{
              loadTransactions(){
                  axios.get('/api/trasactions').then(({data})=>{
-                     this.transactions = data.data;
+                      this.transactions = data.transactions.data;
+                      this.user = data.user
                  })
              }
         },

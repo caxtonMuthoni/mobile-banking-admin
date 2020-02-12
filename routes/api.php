@@ -36,7 +36,7 @@ Route::group([
 
     /* User */
     Route::get('getusers', 'AuthController@getUsers');
-    Route::get('userscount', 'AuthController@usersCount');
+    Route::get('userscount', 'AccountController@usersCount');
     Route::delete('delete/{id}', 'AuthController@destroy');
     Route::post('updateuser/{id}', 'AuthController@updateUser');
     Route::get('user', 'AuthController@loadUser');   
@@ -61,6 +61,7 @@ Route::group([
     Route::get('userloans','BorrowController@getUserLoans');
     Route::get('useractiveloan','BorrowController@getUserActiveLoan');
     Route::get('myborrows','BorrowController@myBorrows');
+    Route::get('activeborrows','BorrowController@activeBorrows');
 
     /* Lend */
     Route::Post('lend','LendController@Lend');
@@ -72,4 +73,7 @@ Route::group([
 
     /* Transactions */
     Route::get('trasactions','TransactionController@index');
+    Route::post('/mytransaction','TransactionController@userTransactions');
   });
+
+  Route::get('payment','AccountController@payment');

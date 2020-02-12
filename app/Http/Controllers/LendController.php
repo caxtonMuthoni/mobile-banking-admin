@@ -179,7 +179,8 @@ class LendController extends Controller
                             $transaction->TransactionType = "Fund Loan to ". $accountToDeposit->AccountName;
                             $transaction->TransID = rand(100000,999999);
                             $transaction->TransAmount = $amountToLend;
-                            $transaction->Account = Auth::user()->id;
+                            $transaction->UserId = Auth::user()->id;
+                            $transaction->AccountNumber = $accountToWithdraw->AccountNumber;
                             $transaction->MSISDN = Auth::user()->PhoneNumber;
                             $transaction->FirstName = Auth::user()->FirstName;
                             $transaction->MiddleName = Auth::user()->MiddleName;
@@ -191,7 +192,8 @@ class LendController extends Controller
                                 $transaction->TransactionType = "Recieved Loan fund from ". $accountToWithdraw->AccountName;
                                 $transaction->TransID = rand(100000,999999);
                                 $transaction->TransAmount = $amountToLend;
-                                $transaction->Account = $accountToDeposit->CustomerID;
+                                $transaction->UserId = $accountToDeposit->CustomerID;
+                                $transaction->AccountNumber = $accountToDeposit->AccountNumber;
                                 $transaction->MSISDN = $borrower->PhoneNumber;
                                 $transaction->FirstName = $borrower->FirstName;
                                 $transaction->MiddleName = $borrower->MiddleName;
@@ -234,7 +236,7 @@ class LendController extends Controller
         if($amountToTransfer > $myBalance){
             return response()->json([
                 'status'=>'false',
-                'error'=>'You dont have enough cash to execute the transfer. Please deposit and try again !!!',
+                'error'=>'Sorry, you have insufficient fund to complete the transaction. Please top up and try again !!!',
             ]);
         }
         $accountToWithdraw->CurrentBalance = $myBalance - $amountToTransfer;
@@ -248,7 +250,8 @@ class LendController extends Controller
                 $transaction->TransactionType = "Tranfer to ". $accountToDeposit->AccountName;
                 $transaction->TransID = rand(100000,999999);
                 $transaction->TransAmount = $amountToTransfer;
-                $transaction->Account = Auth::user()->id;
+                $transaction->UserId = Auth::user()->id;
+                $transaction->AccountNumber = $accountToWithdraw->AccountNumber;
                 $transaction->MSISDN = Auth::user()->PhoneNumber;
                 $transaction->FirstName = Auth::user()->FirstName;
                 $transaction->MiddleName = Auth::user()->MiddleName;
@@ -260,7 +263,8 @@ class LendController extends Controller
                     $transaction->TransactionType = "Recieved from ". $accountToWithdraw->AccountName;
                     $transaction->TransID = rand(100000,999999);
                     $transaction->TransAmount = $amountToTransfer;
-                    $transaction->Account = $accountToDeposit->CustomerID;
+                    $transaction->UserId = $accountToDeposit->CustomerID;
+                    $transaction->AccountNumber = $accountToDeposit->AccountNumber;
                     $transaction->MSISDN = $user->PhoneNumber;
                     $transaction->FirstName = $user->FirstName;
                     $transaction->MiddleName = $user->MiddleName;

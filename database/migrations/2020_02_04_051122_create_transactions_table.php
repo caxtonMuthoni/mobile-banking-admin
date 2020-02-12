@@ -17,12 +17,13 @@ class CreateTransactionsTable extends Migration
             $table->bigIncrements('id');
             $table->string('TransactionType');
             $table->string('TransID');
-            $table->double('TransAmount',8,2);
-            $table->string('Account');
+            $table->string('UserId');
+            $table->string('AccountNumber');
             $table->string('MSISDN');
             $table->string('FirstName');
             $table->string('MiddleName');
             $table->string('LastName');
+            $table->double('TransAmount',8,2);
             $table->double('OrgAccountBalance',8,2);
             $table->double('CrtAccountBalance',8,2);
             $table->timestamps();

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Account;
+use App\Borrow;
 use Illuminate\Http\Request;
 use Validator;
 use App\User;
@@ -35,12 +36,9 @@ class AccountController extends Controller
 
     public function topUpSap(Request $request){
          
-        $valitator = Validator::make($request->all(),[
+        $this->validate($request,[
 	        "Amount"=> "required | numeric",
         ]);
-        if($valitator->fails()){
-            return $valitator->errors();
-        }
 
         $username = "caxton";
         $apiKey = "8ZITSV4TN4aRSjH5eYTCKAP6nUaxIfxL8V0xMuueRFNunW7DL5bq1cf6D3878U92";
@@ -127,12 +125,10 @@ class AccountController extends Controller
     public function deposit(Request $request)
     {   
 
-        $valitator = Validator::make($request->all(),[
+        $this->validate($request,[
             "MPESATransactionID"=>'required'
         ]);
-        if($valitator->fails()){
-            return $valitator->errors();
-        }
+        
         $username = "caxton";
         $apiKey = "8ZITSV4TN4aRSjH5eYTCKAP6nUaxIfxL8V0xMuueRFNunW7DL5bq1cf6D3878U92";
         $MPESATransactionID = $request->MPESATransactionID;
@@ -162,17 +158,18 @@ class AccountController extends Controller
         $result = curl_exec($ch);
          $datas = json_decode($result,true);
 
-         if($datas["status"]){
+        if($datas["status"]){
             $phone = $datas['response']['source'];
             $amount = $datas['response']['Amount'];
             $newPhone = "0".substr($phone,4);
             $user = User::where('PhoneNumber',$newPhone)->first();
-            $Account = Account::where('CustomerID',$user->id)->first();
+            $Account = Account::where([['CustomerID','=',$user->id],['AccountNumber','=',$user->NationalID]])->first();
             $transaction = new Transaction;
             $transaction->TransactionType = "Deposit";
-            $transaction->TransID = $phone;
+            $transaction->TransID = $request->MPESATransactionID;
             $transaction->TransAmount = $amount;
-            $transaction->Account = $user->id;
+            $transaction->UserId = $user->id;
+            $transaction->AccountNumber = $Account->AccountNumber;
             $transaction->MSISDN = $newPhone;
             $transaction->FirstName = $user->FirstName;
             $transaction->MiddleName = $user->MiddleName;
@@ -228,10 +225,14 @@ class AccountController extends Controller
                       
                             return response()->json([
                                 "status"=>"true",
-                                'success'=>'Your  deposit was recieved successifully !!!'
+                                'success'=>'Your  deposit was recieved successfully !!!'
                             ]);
                            }
                       }
+                      return response()->json([
+                        "status"=>"true",
+                        'success'=>'Your  deposit was recieved successfully !!!'
+                    ]);
                 }
             }
             
@@ -250,13 +251,11 @@ class AccountController extends Controller
 
     /* Withdraw */
     public function withdraw(Request $request){
-        $valitator = Validator::make($request->all(),[
+        $this->validate($request,[
             "PhoneNumber"=>"required | max:10 | min:10 | regex:/(07)[0-9]{8}/",
 	        "Amount"=> "required | numeric",
         ]);
-        if($valitator->fails()){
-            return $valitator->errors();
-        }
+        
         $phone = $request->PhoneNumber;
         $Amount=$request->Amount;
         $user = User::where('PhoneNumber',$phone)->first();
@@ -270,7 +269,7 @@ class AccountController extends Controller
         if($accountBal < $Amount){
             return response()->json([
                 "status"=>"false",
-                'error' => "You don,t Have enough Money to perfom the trnscation."
+                'error' => "Sorry, You have insufficient funds to complete the transcation."
             ]);
         }
         else{
@@ -309,12 +308,13 @@ class AccountController extends Controller
             $amount = $datas['response']['Amount'];
             $newPhone = "0".substr($phone,4);
             $user = User::where('PhoneNumber',$newPhone)->first();
-            $Account = Account::where('CustomerID',$user->id)->first();
+            $Account = Account::where([['CustomerID','=',$user->id],['AccountNumber','=',$user->NationalID]])->first();
             $transaction = new Transaction;
             $transaction->TransactionType = "Withdraw";
-            $transaction->TransID = $request->MPESATransactionID;
+            $transaction->TransID = rand(100000,999999);
             $transaction->TransAmount = $amount;
-            $transaction->Account = $user->id;
+            $transaction->UserId = $user->id;
+            $transaction->AccountNumber = $Account->AccountNumber;
             $transaction->MSISDN = $newPhone;
             $transaction->FirstName = $user->FirstName;
             $transaction->MiddleName = $user->MiddleName;
@@ -370,10 +370,14 @@ class AccountController extends Controller
                       
                             return response()->json([
                                 "status"=>"true",
-                                'success'=>'Your  deposit was recieved successifully !!!'
+                                'success'=>'Your  Withdrawal was proccesses successfully !!!'
                             ]);
                            }
                       }
+                      return response()->json([
+                        "status"=>"true",
+                        'success'=>'Your  Withdrawal was proccesses successfully !!!'
+                    ]);
                 }
             }
             
@@ -441,7 +445,8 @@ class AccountController extends Controller
                 $transaction->TransactionType = "Direct deposit by ".auth('api')->user()->FirstName.auth('api')->user()->NationalID;
                 $transaction->TransID = rand(100000,999999);
                 $transaction->TransAmount = $request->CurrentBal;
-                $transaction->Account = $request->id;
+                $transaction->UserId = $request->id;
+                $transaction->AccountNumber = $request->AccountNumber;
                 $transaction->MSISDN = auth('api')->user()->PhoneNumber;
                 $transaction->FirstName = $user->FirstName;
                 $transaction->MiddleName = $user->MiddleName;
@@ -474,7 +479,8 @@ class AccountController extends Controller
                 $transaction->TransactionType = "Direct withdraw by ".auth('api')->user()->FirstName.auth('api')->user()->NationalID;
                 $transaction->TransID = rand(100000,999999);
                 $transaction->TransAmount = $request->CurrentBal;
-                $transaction->Account = $request->id;
+                $transaction->UserId = $request->id;
+                $transaction->AccountNumber = $request->AccountNumber;
                 $transaction->MSISDN = auth('api')->user()->PhoneNumber;
                 $transaction->FirstName = $user->FirstName;
                 $transaction->MiddleName = $user->MiddleName;
@@ -527,6 +533,34 @@ class AccountController extends Controller
     public function update(Request $request, Account $account)
     {
         //
+    }
+
+    public function usersCount(){
+        $username = 'cagimu'; 
+        $apiKey   = '4364fea1f320e7d417614fc23bd4f8bc312268e29b1cf000c45c0cc0772036eb'; 
+        $AT       = new AfricasTalking($username, $apiKey);
+        //Checking Account Balance
+        $data = $AT->application()->fetchApplicationData();
+        $newData = $data['data'];
+        $UserData = get_object_vars($newData);
+        $newUserData = $UserData['UserData'];
+        $balanced = get_object_vars($newUserData);
+        $newBalance = $balanced['balance'];
+        $BAL = substr($newBalance,4);
+
+     $smses = SMS::all();
+     $cost = 0;
+     foreach($smses as $sms){
+       $cost = $cost + $sms->amount;
+     }
+        $users = User::get()->count();
+        $loans = Borrow::all()->count();
+        return response()->json([
+            'users'=>$users,
+            'loans'=>$loans,
+            'usage'=>round($cost,3),
+            'bal'=>round($BAL,2),
+        ]);
     }
 
     /**

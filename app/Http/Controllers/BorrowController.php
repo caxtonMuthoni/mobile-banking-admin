@@ -80,6 +80,11 @@ class BorrowController extends Controller
         }
     }
 
+    public function activeBorrows(){
+        $borrows = Borrow::where([['status','=',0],['paymentstatus','=',1]])->get();
+        return $borrows;
+    }
+
     public function destroy(Borrow $borrow)
     {
         //

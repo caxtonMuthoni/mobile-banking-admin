@@ -132,12 +132,7 @@ class AuthController extends Controller
         ]);
     }
   
-    public function usersCount(){
-        $users = User::get()->count();
-        return response()->json([
-            'users'=>$users
-        ]);
-    }
+    
 
     public function destroy($id){
         $user = User::find($id);
@@ -153,4 +148,6 @@ class AuthController extends Controller
         $user = auth('api')->user();
         return $user;
     }
+
+   
 }

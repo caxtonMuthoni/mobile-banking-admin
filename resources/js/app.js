@@ -58,6 +58,8 @@ Vue.filter('time',function(time){
 });
 
 
+
+
 import VueProgressBar from 'vue-progressbar'
 
 Vue.use(VueProgressBar, {
@@ -82,11 +84,19 @@ const routes = [
         /* =========Account============ */
      {path: '/accounts',component: require('./components/Account/accounts.vue').default },
      {path: '/topup',component: require('./components/Account/deposit.vue').default },
+     {path: '/withdraw',component: require('./components/Account/withdraw.vue').default },
 
      {path: '/profile',component: require('./components/Profile/profile.vue').default },
 
      /* transcation */
      {path: '/transactions',component: require('./components/Transaction/transactions.vue').default },
+     {path: '/statement',component: require('./components/Transaction/statement.vue').default },
+
+     /* LOans */
+     {path: '/loans',component: require('./components/Loan/loans.vue').default },
+     {path: '/activeloans',component: require('./components/Loan/activeLoans.vue').default },
+     {path: '/graph',component: require('./components/graph.vue').default },
+
     
 
   ]

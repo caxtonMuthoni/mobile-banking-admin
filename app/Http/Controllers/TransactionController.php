@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Transaction;
+use App\User;
 use Illuminate\Http\Request;
 
 class TransactionController extends Controller
@@ -15,7 +16,23 @@ class TransactionController extends Controller
     public function index()
     {
         $transactions = Transaction::latest()->paginate(10);
-        return $transactions ;
+        $user = auth('api')->user();
+        return response()->json([
+            'user' => $user,
+            'transactions'=>$transactions
+        ]);
+    }
+
+    public function userTransactions(Request $request){
+        $this->validate($request,[
+            "MSISDN"=>"required | max:10 | min:10 | regex:/(07)[0-9]{8}/",
+        ]);
+        $transactions = Transaction::where('MSISDN',$request->MSISDN)->latest()->get();
+        $user = User::where('PhoneNumber',$request->MSISDN)->first();
+        return response()->json([
+            'user' => $user,
+            'transactions'=>$transactions
+        ]);
     }
 
     /**

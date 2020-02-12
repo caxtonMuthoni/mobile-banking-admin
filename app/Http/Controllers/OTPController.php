@@ -12,9 +12,9 @@ use AfricasTalking\SDK\AfricasTalking;
 class OTPController extends Controller
 {
 /* Generating OTP and sending it to the user */
-  public static function generateOtp(Request $request){
+  public function generateOtp(Request $request){
     $otp = rand(1000,9999);
-    $phone = Auth::user()->PhoneNumber;
+    $phone = auth('api')->user()->PhoneNumber;
     $newOtp = new OTP;
     $newOtp->userid = Auth::user()->id;
     $newOtp->PhoneNumber = $phone;
@@ -64,21 +64,26 @@ class OTPController extends Controller
                 if($mySms->save()){
                     return response()->json([
                         "status"=>"true",
-                        "success" => "OTP sent successifully."
+                        "success" => "OTP sent successfully."
                     ]);
                 }
             }
         }
+        else{
+            return response()->json([
+                "status"=>"false",
+                "error" => "OTP generation failed."
+            ]);
+        }
   }
 
-  public static function checkOTP(Request $request){
+  public function checkOTP(Request $request){
       /* Validation */
-      $validator =  Validator($request->all(),[
+
+        $this->validate($request,[
          'otp' => 'required | max:4',
       ]);
-      if($validator->fails()){
-          return $validator->errors();
-      }
+      
       $oTP = OTP::where([['OTP','=',$request->otp],['Status','=',false],['PhoneNumber','=',Auth::user()->PhoneNumber]])->first();
        if($oTP === null){
            return response()->json([
