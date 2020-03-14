@@ -10,7 +10,10 @@ use App\User;
 use AfricasTalking\SDK\AfricasTalking;
 use App\SMS;
 use App\Transaction;
-
+use Auth;
+use App\Helpers\Transact;
+use GuzzleHttp\Client;
+use Guzzle\Http\Exception\ClientErrorResponseException;
 class AccountController extends Controller
 {
     /**
@@ -128,7 +131,10 @@ class AccountController extends Controller
         $this->validate($request,[
             "MPESATransactionID"=>'required'
         ]);
-        
+        return response()->json([
+            "status"=>"true",
+            'success'=>'Your  deposit was recieved successfully !!!'
+        ]);
         $username = "caxton";
         $apiKey = "8ZITSV4TN4aRSjH5eYTCKAP6nUaxIfxL8V0xMuueRFNunW7DL5bq1cf6D3878U92";
         $MPESATransactionID = $request->MPESATransactionID;
@@ -255,6 +261,7 @@ class AccountController extends Controller
             "PhoneNumber"=>"required | max:10 | min:10 | regex:/(07)[0-9]{8}/",
 	        "Amount"=> "required | numeric",
         ]);
+
         
         $phone = $request->PhoneNumber;
         $Amount=$request->Amount;
@@ -502,22 +509,36 @@ class AccountController extends Controller
     {
         /* Validation */
         $validator = Validator::make($request->all(),[
-           "AccountType"=>"required",
-           "AccountName" => "required",
+           "AccountCode"=>"required",
+           "AccountName" => "required |regex:/^[\pL\s\-]+$/u | unique:accounts",
         ]);
 
         if($validator->fails()){
             return $validator->errors();
         }
-        $accountNo = Auth::user()->NationalID;
-        $accountType = $request->AccountType;
-        switch($accountType){
-            case 'normal' :
-                $accountNumber = "100".$accountNo;
-            break;
-            case 'organisation':
-                $accountNumber ="200".$accountNo;
 
+        $accounts  = Account::where('CustomerID',Auth::user()->id)->count();
+        if ($accounts >=5) {
+            return response()->json([
+                'status' => 'false',
+                'error'=>"You have reached the maximum number of accounts required !!!"
+            ]);
+        }
+        $accountNo = Auth::user()->NationalID;
+        $accountCode = $request->AccountCode;
+        $accountNumber = $accountCode.$accountNo;
+
+        $account = new Account;
+        $account->AccountName = $request->AccountName;
+        $account->AccountNumber = $accountNumber;
+        $account->CustomerID = Auth::user()->id;
+        $account->CurrentBalance = 0.0;
+        $account->Status = true;
+        if($account->save()){
+            return response()->json([
+                'status' => 'true',
+                'success' => "Account created successifully !!!"
+            ]);
         }
 
        
@@ -563,14 +584,209 @@ class AccountController extends Controller
         ]);
     }
 
+
+    public function getUsersAccounts(){
+        $userId = auth('api')->user()->id;
+        $accounts = Account::where('CustomerID',$userId)->get();
+        return $accounts;
+    }
+
     /**
      * Remove the specified resource from storage.
      *
      * @param  \App\Account  $account
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Account $account)
+
+     public function buyAirtime( Request $request){
+
+        /* validation  */
+        $this->validate($request,[
+            'phone'=>'required',
+            'amount'=>'required | numeric | min:10 | max:500'
+        ]);
+        /* Get user */
+        $user = auth('api')->user();
+        /* Get Account */
+        $account = Account::where('CustomerID',$user->id)->first();
+        if($account->CurrentBalance < $request->amount){
+            return response()->json([
+                'status'=>'false',
+                'error'=>'You have insufficient funds to execute the transaction'
+            ]);
+        }
+        //API URL
+        $url = 'https://renthero.co.ke/phpsap/developer/payments/airtime.php';
+        $username ='caxton';
+        $apiKey = '8ZITSV4TN4aRSjH5eYTCKAP6nUaxIfxL8V0xMuueRFNunW7DL5bq1cf6D3878U92';
+        $Amount = $request->amount;
+        $phone = substr($request->phone,1);
+        $PhoneNumber = '+254'.$phone;
+    
+        //create a new cURL resource
+        $ch = curl_init($url);
+
+        //setup request to send json via POST
+        $data = array(
+            'username' => $username,
+            'apiKey' => $apiKey,
+            "Receiver"=>$PhoneNumber,
+	        "Amount"=> $Amount,
+        );
+        $payload = json_encode($data);
+        //attach encoded JSON string to the POST fields
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
+
+        //set the content type to application/json
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type:application/json'));
+
+        //return response instead of outputting
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+        //execute the POST request
+        $result = curl_exec($ch);
+        $datas = json_decode($result,true);
+        if($datas["status"]){
+            $account->CurrentBalance = $account->CurrentBalance - $request->amount;
+            if($account->save()){
+                $transact = new Transact;
+                $status = $transact->transact(
+                    "airtime Purchase",
+                    rand(1000000,96859699365),
+                     $request->amount,
+                    $user->id,
+                    $account->AccountNumber,
+                    $user->PhoneNumber,
+                    $user->FirstName,
+                    $user->MiddleName,
+                    $user->LastName,
+                    $account->CurrentBalance+$request->amount,
+                    $account->CurrentBalance
+                  );
+         
+                  if($status){
+                      return response()->json([
+                       "status"=>"true",
+                        "success"=>" You have successifully purchased ". $request->amount. " airtime."
+                      ]);
+                  }
+         
+            }
+    
+        }else{
+            $datas = json_decode($result,true);
+          return response()->json([
+              "status"=>'false',
+              "error"=>$datas['response']
+          ]);
+        }
+       
+     }
+
+     public function payBill(Request $request){
+         /* Validation */
+         $this->validate($request,[
+             'DestinationChannel'=> 'required | string | min:5 | max:7',
+             'DestinationAccount' => 'required',
+             'amount'=>'required | numeric | min:10| max: 70000'
+         ]);
+
+         /* Get user */
+        $user = auth('api')->user();
+        /* Get Account */
+        $account = Account::where('CustomerID',$user->id);
+
+         $apiKey="8ZITSV4TN4aRSjH5eYTCKAP6nUaxIfxL8V0xMuueRFNunW7DL5bq1cf6D3878U92";
+         $DestinationChannel=$request->DestinationChannel;
+         $DestinationAccount =$request->DestinationAccount;
+         $Amount = $request->amount;
+         $url = "https://renthero.co.ke/phpsap/developer/payments/sapb2b.php";
+
+          //create a new cURL resource
+        $ch = curl_init($url);
+
+        //setup request to send json via POST
+        $data = array(
+            'username' => 'caxton',
+            'apiKey' => $apiKey,
+            "DestinationChannel"=>$DestinationChannel,
+            "DestinationAccount" => $DestinationAccount,
+	        "Amount"=> $Amount,
+        );
+        $payload = json_encode($data);
+        //attach encoded JSON string to the POST fields
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
+
+        //set the content type to application/json
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type:application/json'));
+
+        //return response instead of outputting
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+        //execute the POST request
+        $result = curl_exec($ch);
+        $datas = json_decode($result,true);
+        if($datas["status"]){
+            $account->CurrentBalance = $account->CurrentBalance - $request->amount;
+            if($account->save()){
+                $transact = new Transact;
+                $status = $transact->transact(
+                    "PayBill ".$DestinationChannel." Account ".$DestinationAccount,
+                    rand(1000000,96859699365),
+                    $request->amount,
+                    $user->id,
+                    $account->AccountNumber,
+                    $user->PhoneNumber,
+                    $user->FirstName,
+                    $user->MiddleName,
+                    $user->LastName,
+                    $account->CurrentBalance+$request->amount,
+                    $account->CurrentBalance
+                  );
+         
+                  if($status){
+                      return response()->json([
+                       "status"=>"true",
+                        "success"=>" You have successifully paid ". $request->amount. " to PayBill ".$DestinationChannel." to account ".$DestinationAccount,
+                      ]);
+                  }
+         
+            }
+    
+        }else{
+            $datas = json_decode($result,true);
+          return response()->json([
+              "status"=>'false',
+              "error"=>$datas['response']
+          ]);
+        }
+       
+     }
+
+     public function accountStatement(Request $request){
+         $this->validate($request,[
+             'accountNumber'=>'required | numeric '
+         ]);
+         $statement = Transaction::where('AccountNumber',$request->accountNumber)->latest()->get();
+         return $statement;
+     }
+     
+    public function destroy($id)
     {
-        //
+        $account =  Account::where([['id','=',$id],['CustomerID','=',Auth::user()->id]])->first();
+        if($account->CurrentBalance > 0){
+            return response()->json([
+                'status'=>'false',
+                'error'=>"The current balance must be Zero please tranfer funds to another account and try again."
+            ]);
+        }
+        else{
+            if($account->delete()){
+                return response()->json([
+                    'status'=>'true',
+                    'success'=>"The account was deleted successifully !!!."
+                ]);
+            }
+        }
     }
 }

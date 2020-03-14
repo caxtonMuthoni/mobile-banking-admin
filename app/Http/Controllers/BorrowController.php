@@ -39,7 +39,7 @@ class BorrowController extends Controller
         /* Validation */
         $validator = Validator::make($request->all(),[
             "amountBorrowed" => "required | numeric",
-            "image" => "max:5000 | mimes:jpg,jpeg,png",
+            "image" => "required",
             "description" => "min:150 |max:500 | required",
             "title"=> "required | min:20 | max:60 |string",
         ]);
@@ -53,17 +53,27 @@ class BorrowController extends Controller
             ]);
         }
         $fileName = "default.png";
-       
-        if($request->hasFile('image')) {
-            $userName = Auth::user()->name;
-            $image = $request->file('image');
-            $imageName = $image->getClientOriginalName();
-            $fileName = $userName.time() . "_project".$imageName;
-    
+
+        if($request->type = 'android'){
+            $fileName = $request->name;
+            $realImage = base64_decode($request->image);
             $directory = public_path('/images/project/');
             $imageUrl = $directory.$fileName;
-            Image::make($image)->resize(200, 200)->save($imageUrl);
+            file_put_contents($imageUrl,$realImage);
+        } else{
+            if($request->hasFile('image')) {
+                $userName = Auth::user()->name;
+                $image = $request->file('image');
+                $imageName = $image->getClientOriginalName();
+                $fileName = $userName.time() . "_project".$imageName;
+        
+                $directory = public_path('/images/project/');
+                $imageUrl = $directory.$fileName;
+                Image::make($image)->resize(200, 200)->save($imageUrl);
+            }
         }
+       
+        
 
         $borrow = new Borrow;
         $borrow->userId = Auth::user()->id;
@@ -81,7 +91,7 @@ class BorrowController extends Controller
     }
 
     public function activeBorrows(){
-        $borrows = Borrow::where([['status','=',0],['paymentstatus','=',1]])->get();
+        $borrows = Borrow::where([['status','=',1],['paymentstatus','=',0]])->get();
         return $borrows;
     }
 

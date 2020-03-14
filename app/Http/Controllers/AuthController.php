@@ -28,7 +28,7 @@ class AuthController extends Controller
             'FirstName' => 'required|string',
             'MiddleName' => 'required|string',
             'LastName' => 'required|string',
-            'NationalID' => 'required|numeric',
+            'NationalID' => 'required|numeric|unique:users',
             'PhoneNumber' => 'required | max:10 | min:10 | regex:/(07)[0-9]{8}/ | unique:users',
             'City' => 'required|string',
             'email' => 'required|string|email|unique:users',
@@ -46,6 +46,7 @@ class AuthController extends Controller
         ]);
         $user->save();
         return response()->json([
+             'status'=>"true",
             'message' => 'Successfully created user!'
         ], 201);
     }
@@ -148,6 +149,10 @@ class AuthController extends Controller
         $user = auth('api')->user();
         return $user;
     }
+   public function loadUserWithId($id){
+       $user = User::find($id);
+       return $user;
+   }
 
    
 }

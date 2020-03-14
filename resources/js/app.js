@@ -96,8 +96,13 @@ const routes = [
      {path: '/loans',component: require('./components/Loan/loans.vue').default },
      {path: '/activeloans',component: require('./components/Loan/activeLoans.vue').default },
      {path: '/graph',component: require('./components/graph.vue').default },
+     /* School */
+     {path: '/schools',component: require('./components/School/schools.vue').default },
+     /* Account TYpes */
+     {path: '/acounttypes',component: require('./components/AccountType/accountTypes.vue').default },
 
-    
+     /*  Reviews */
+     {path: '/reviews', component: require('./components/Review/reviews.vue').default}
 
   ]
 

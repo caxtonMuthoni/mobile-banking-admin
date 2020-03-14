@@ -40,7 +40,7 @@ class ProfileController extends Controller
     {
         //validation
         $this->validate($request,[
-            'EmploymentStatus'=>'required | boolean',
+            'EmploymentStatus'=>'required',
             'Company'=>'required |string',
             'Occupation'=>'required |string',
             'AnualIncome'=>'required |string',
@@ -49,6 +49,7 @@ class ProfileController extends Controller
             'EducationLevel'=>'required | string',
         ]);
        
+        $fileName = "defalut.png";
         $userId = auth('api')->user()->id;
         $CheckProfile = Profile::where('UserId',$userId)->first();
         if($CheckProfile === null){
@@ -56,8 +57,21 @@ class ProfileController extends Controller
         }
         else{
             $profile = $CheckProfile;
+        } 
+        if($request->android && $request->Avatar && $request->Avatar != ''){
+            $fileName = $request->imname;
+            if ($profile->Avatar && $profile->Avatar != "default.png"){
+                unlink(public_path('/images/avatar/').$profile->Avatar);
+            }
+
+            $realImage = base64_decode($request->Avatar);
+            $directory = public_path('/images/avatar/');
+            $imageUrl = $directory.$fileName;
+            file_put_contents($imageUrl,$realImage);
+           /*  Image::make($realImage)->resize(200, 200)->encode('jpg',100)->save($imageUrl); */
         }
-        if($request->Avatar){
+       else{
+        if($request->Avatar && $request->Avatar != ''){
             $fileName = time().'.'.explode('/',explode(':',substr($request->Avatar,0,strpos($request->Avatar,';')))[1])[1];
             if ($profile->Avatar && $profile->Avatar != "default.png"){
                 unlink(public_path('/images/avatar/').$profile->Avatar);
@@ -67,6 +81,7 @@ class ProfileController extends Controller
             $imageUrl = $directory.$fileName;
             Image::make($request->Avatar)->resize(200, 200)->save($imageUrl);
         }
+       }
        
         $profile->UserId = $userId;
         $profile->Avatar = $fileName;

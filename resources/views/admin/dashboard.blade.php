@@ -310,9 +310,61 @@
                   <p>Transactions</p>
                 </router-link>
               </li>
+            </ul>
+          </li>
+
+          <li class="nav-item has-treeview">
+            <a href="#" class="nav-link">
+              <i class="nav-icon green fas fa-school    "></i>
+              <p>
+              Schools
+                <i class="fas fa-angle-left right"></i>
+              </p>
+            </a>
+            <ul class="nav nav-treeview">
               <li class="nav-item">
-              <router-link to="/bar" class="nav-link">Go to Bar</router-link>
+                <router-link to="/schools" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Schools</p>
+                </router-link>
               </li>
+          
+            </ul>
+          </li>
+          <li class="nav-item has-treeview">
+            <a href="#" class="nav-link">
+              <i class=" nav-icon fas fa-comment    "></i>
+              <p>
+              Review
+                <i class="fas fa-angle-left right"></i>
+              </p>
+            </a>
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <router-link to="/reviews" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Reviews</p>
+                </router-link>
+              </li>
+          
+            </ul>
+          </li>
+          <li class="nav-item has-treeview">
+            <a href="#" class="nav-link">
+              <i class="fas fa-cogs  blue  "></i>
+              <p>
+              Account settings
+                <i class="fas fa-angle-left right"></i>
+              </p>
+            </a>
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <router-link to="/acounttypes" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Account types</p>
+                </router-link>
+              </li>
+          
             </ul>
           </li>
           

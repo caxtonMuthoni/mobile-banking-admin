@@ -39,7 +39,8 @@ Route::group([
     Route::get('userscount', 'AccountController@usersCount');
     Route::delete('delete/{id}', 'AuthController@destroy');
     Route::post('updateuser/{id}', 'AuthController@updateUser');
-    Route::get('user', 'AuthController@loadUser');   
+    Route::get('user', 'AuthController@loadUser'); 
+    Route::get('user/{id}', 'AuthController@loadUserWithId');   
 
     /* Account */
     Route::get('accounts','AccountController@index'); 
@@ -51,6 +52,11 @@ Route::group([
     Route::Post('openaccount','AccountController@openAccount');
     Route::Post('directdeposit','AccountController@directDeposit');
     Route::Post('directwithdraw','AccountController@directWithdraw'); 
+    Route::get('getusersaccounts','AccountController@getUsersAccounts');
+    Route::get('delete/{id}','AccountController@destroy');
+    Route::Post('buyairtime','AccountController@buyAirtime');
+    Route::Post('paybill','AccountController@PayBill');
+    Route::Post('accountstatement','AccountController@accountStatement');
 
     /* OTP */
     Route::Post('getotp','OTPController@generateOtp');
@@ -66,6 +72,7 @@ Route::group([
     /* Lend */
     Route::Post('lend','LendController@Lend');
     Route::Post('tranfercash','LendController@transferCash'); 
+    Route::get('mylends','LendController@myLends'); 
 
     /* profile */
     Route::post('saveprofile','ProfileController@store');
@@ -74,6 +81,23 @@ Route::group([
     /* Transactions */
     Route::get('trasactions','TransactionController@index');
     Route::post('/mytransaction','TransactionController@userTransactions');
+
+    /* Schools */
+    Route::get('/schools','SchoolController@index');
+    Route::post('/addschool','SchoolController@store');
+    Route::post('/editschool/{id}','SchoolController@update');
+
+    /* Account types */
+    Route::get('/accounttypes','AccountTypeController@index');
+    Route::post('/postaccounttypes','AccountTypeController@store');
+    Route::post('/updateaccounttypes/{id}','AccountTypeController@update');
+
+    /* Reviews */
+    Route::get('/all','ReviewController@getAll');
+    Route::get('/reviews','ReviewController@index');
+    Route::post('/sendreview','ReviewController@store');
+    Route::post('/updatereview','ReviewController@update');
   });
+
 
   Route::get('payment','AccountController@payment');

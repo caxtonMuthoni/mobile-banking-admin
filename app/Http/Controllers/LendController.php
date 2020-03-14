@@ -226,11 +226,19 @@ class LendController extends Controller
             'amount' => 'required | numeric', 
             'accountId'=>'required',
             'accountNumber' => 'required',
+        
         ]);
         if ($validator->fails()){
             return $validator->errors();
         }
-        $accountToWithdraw = Account::where('CustomerID',Auth::user()->id)->first();
+        $accountToDeposit = Account::where([['AccountNumber','=',$request->accountNumber]])->first();
+        if($accountToDeposit ===  null){
+            return response()->json([
+                'status'=>'false',
+                'error'=>'Sorry, the account number you provided is not valid. Please try again. !!!',
+            ]);
+        }
+        $accountToWithdraw = Account::where([['CustomerID','=',Auth::user()->id],['id','=',$request->accountId]])->first();
         $amountToTransfer = $request->amount;
         $myBalance = $accountToWithdraw->CurrentBalance;
         if($amountToTransfer > $myBalance){
@@ -241,7 +249,7 @@ class LendController extends Controller
         }
         $accountToWithdraw->CurrentBalance = $myBalance - $amountToTransfer;
         if($accountToWithdraw->save()){
-            $accountToDeposit = Account::where([['id','=',$request->accountId],['AccountNumber','=',$request->accountNumber]])->first();
+            $accountToDeposit = Account::where([['AccountNumber','=',$request->accountNumber]])->first();
             $user = User::where('id',$accountToDeposit->CustomerID)->first();
             $userBal = $accountToWithdraw->CurrentBalance;
             $accountToDeposit->CurrentBalance = $accountToDeposit->CurrentBalance + $amountToTransfer;
@@ -285,6 +293,11 @@ class LendController extends Controller
             'status'=>'false',
             'success'=>'Transfer could not be processed fo now. Try again later !!!',
         ]);
+    }
+
+    public function myLends(){
+        $lends = Lend::where('userId',auth('api')->user()->id)->latest()->get();
+        return $lends;
     }
 
     /**
