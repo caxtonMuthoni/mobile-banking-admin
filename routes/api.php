@@ -73,14 +73,17 @@ Route::group([
     Route::Post('lend','LendController@Lend');
     Route::Post('tranfercash','LendController@transferCash'); 
     Route::get('mylends','LendController@myLends'); 
+    
 
     /* profile */
     Route::post('saveprofile','ProfileController@store');
     Route::get('show','ProfileController@show');
+    Route::get('show/{id}','ProfileController@showprofile');
 
     /* Transactions */
     Route::get('trasactions','TransactionController@index');
     Route::post('/mytransaction','TransactionController@userTransactions');
+    Route::post('/transact','StandingOrdersController@create');
 
     /* Schools */
     Route::get('/schools','SchoolController@index');
@@ -97,7 +100,52 @@ Route::group([
     Route::get('/reviews','ReviewController@index');
     Route::post('/sendreview','ReviewController@store');
     Route::post('/updatereview','ReviewController@update');
+
+    /* Loan Types */
+    Route::get('/loantypes','LoanTypeController@index');
+    Route::post('/addloantype','LoanTypeController@store');
+    Route::post('/updateloantype/{id}','LoanTypeController@update');
+
+    /* Loan */
+    Route::get('/loans','LoanController@index');
+    Route::get('/loan/{id}','LoanController@show');
+    Route::post('/addloan','LoanController@store');
+    Route::post('/updateloan/{id}','LoanController@update');
+    Route::get('loanpayment/{id}','LoanController@loanStatement');
+    Route::get('userloans/{id}','LoanController@userLoans');
+    Route::get('loans/{value}','LoanController@loanProcess');
+    Route::get('/defaulting','LoanController@defaultingLoans');
+
+    /* Guarantors */
+    Route::get('/guarantors','GuarantorController@index');
+    Route::post('/guarantee','GuarantorController@store');
+    Route::get('/loanguarantors/{id}','GuarantorController@getLoanGuarantors');
+
+    /* Shares */
+    Route::get('/shares','SharesController@index');
+    Route::post('/createshare','SharesController@store');
+    Route::post('/depositshare','SharesController@deposit');
+
+     /* Transaction costs */
+     Route::get('/transactioncosts','TransactionCostController@index');
+     Route::post('/addtransactioncost','TransactionCostController@store');
+     Route::post('/updatetransactioncost/{id}','TransactionCostController@update');
+
+     /* Standing orders */
+     Route::get('/standingorders','StandingOrdersController@index');
+     Route::post('/addstandingorder','StandingOrdersController@store');
+     Route::post('/updatestandingorder/{id}','StandingOrdersController@update');
+
+     /* Group Account */
+     Route::get('/groupaccounts','GroupAccountController@index');
+     Route::post('/addgroupaccount','GroupAccountController@store');
+     Route::post('/updatestandingorder/{id}','StandingOrdersController@update');
+
+    
+
+    /* Reports */
+    Route::get('usersreport','AccountController@usersreport');
   });
 
 
-  Route::get('payment','AccountController@payment');
+ 

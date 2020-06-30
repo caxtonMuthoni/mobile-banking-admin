@@ -17,6 +17,7 @@ class CreateAccountsTable extends Migration
             $table->bigIncrements('id');
             $table->double("AccountNumber");
             $table->string('AccountName');
+            $table->string('AccountCode');
             $table->string('CustomerID');
             $table->string('CurrentBalance');
             $table->string('Status');

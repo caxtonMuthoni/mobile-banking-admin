@@ -4,7 +4,7 @@
           <div class="card-body">
             <h4 class="card-title indigo"><i class=" mr-2 fas fa-comment    "></i><strong>Reviews</strong></h4> <br><br>
             <div class="dropdown-divider col-md-12"></div>
-            <table class="table table-stripped table-bordered">
+            <table class="table table-striped table-bordered">
                 <thead>
                     <th>#</th>
                     <th>Name</th>

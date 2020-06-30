@@ -15,26 +15,42 @@ export default {
   },
   data(){
     return {
-      datacollection: null
+      datacollection: null,
+      usersInfo : []
     }
   },
-  mounted () {
-    this.fillData()
-  },
+ 
   methods: {
-       fillData ()
-    {
+    loadData(){
+      axios.get('api/usersreport').then((data)=>{
+        this.usersInfo = data.data
+        this.fillData()
+
+      })
+    },
+       fillData () {
       this.datacollection = {
-        labels: ['Lunes','Martes','Miercoles','Jueves','Viernes', 'Sabado' , 'Domingo'],
+        labels: [
+                  window.moment().subtract(4, 'months').format('MMM'),
+                  window.moment().subtract(3, 'months').format('MMM'),
+                  window.moment().subtract(2, 'months').format('MMM'),
+                  window.moment().subtract(1, 'months').format('MMM'),
+                   window.moment().format('MMMM'),
+                  ],
+                 
         datasets: [
           {
-            label: 'Ventas',
+            label: 'Users',
             backgroundColor: '#FF0066',
-            data: [ 20, 40, 50, 20, 50, 40]
+            data: this.usersInfo,
+            title: "Registered users within last five months"
           },
         ]
       }
     }
+  },
+   created () {
+    this.loadData()
   }
 }
 </script>

@@ -4,6 +4,8 @@ namespace App\Console;
 
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
+use App\Console\Commands\ExecuteLoanPayment;
+use App\Console\Commands\ExecuteStandingOrders;
 
 class Kernel extends ConsoleKernel
 {
@@ -13,7 +15,8 @@ class Kernel extends ConsoleKernel
      * @var array
      */
     protected $commands = [
-        //
+        ExecuteStandingOrders::class,
+        ExecuteLoanPayment::class
     ];
 
     /**
@@ -26,6 +29,8 @@ class Kernel extends ConsoleKernel
     {
         // $schedule->command('inspire')
         //          ->hourly();
+        $schedule->command('execute:standingOrders')->everyMinute();
+        $schedule->command('execute:loanPayment')->everyMinute();
     }
 
     /**

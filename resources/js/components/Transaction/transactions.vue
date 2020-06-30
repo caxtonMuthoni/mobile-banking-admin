@@ -2,11 +2,11 @@
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-md-12">
-                <div class="card">
+                <div class="card mt-2">
                     <div class="card-header"><strong class="indigo">Transcations</strong></div>
 
-                    <div class="card-body">
-                        <table class="table table-bordered table-stripped">
+                    <div class="card-body table-responsive">
+                        <table class="table table-bordered text-sm table-striped">
                             <thead>
                                 <th>#</th>
                                 <th>Description</th>
@@ -18,14 +18,14 @@
                                 <th>Date</th>
                             </thead>
                             <tbody>
-                                <tr v-for="transaction in transactions" :key="transaction.id">
+                                <tr v-for="transaction in transactions.data" :key="transaction.id">
                                     <td>{{transaction.id}}</td>
-                                    <td>{{transaction.TransID}}</td>
-                                     <td>{{transaction.TransactionType}}</td>
-                                    <td>{{transaction.TransAmount}}</td>
-                                    <td>{{transaction.FirstName}} {{transaction.Githinji}}</td>
-                                    <td>{{transaction.OrgAccountBalance}}</td>
-                                    <td>{{transaction.CrtAccountBalance}}</td>
+                                    <td>{{transaction.description}}</td>
+                                     <td>{{transaction.transactionID}}</td>
+                                    <td>{{transaction.amount}}</td>
+                                    <td>{{transaction.user}}</td>
+                                    <td>{{transaction.original_bal}}</td>
+                                    <td>{{transaction.new_bal}}</td>
                                     <td>{{transaction.created_at | upDate}}</td>
                                     
       
@@ -43,6 +43,9 @@
                             </tfoot>
                         </table>
                     </div>
+                    <div class="card-footer">
+                        <pagination class="float-right" :data="transactions" :limit="2" @pagination-change-page="getResults"></pagination>
+                    </div>
                 </div>
             </div>
         </div>
@@ -57,10 +60,23 @@
              }
         },
         methods:{
+             getResults(page = 1){
+                this.$Progress.start()
+                axios.get('/api/trasactions?page='+page).then(({data})=>{
+                      this.transactions = data;
+                      this.$Progress.finish()
+                 }).catch(()=>{
+                     this.$Progress.fail()
+                 })
+             },
+
              loadTransactions(){
+                 this.$Progress.start()
                  axios.get('/api/trasactions').then(({data})=>{
-                      this.transactions = data.transactions.data;
-                      this.user = data.user
+                      this.transactions = data;
+                      this.$Progress.finish()
+                 }).catch(()=>{
+                     this.$Progress.fail()
                  })
              }
         },

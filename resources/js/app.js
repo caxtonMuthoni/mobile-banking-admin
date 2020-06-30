@@ -12,6 +12,7 @@ window.Fire = new Vue();
 window.Form = Form;
 import { Form, HasError, AlertError } from 'vform'
 import moment from 'moment'
+window.moment = moment
 
 /* Sweet alert */
 import Swal from 'sweetalert2'
@@ -85,8 +86,9 @@ const routes = [
      {path: '/accounts',component: require('./components/Account/accounts.vue').default },
      {path: '/topup',component: require('./components/Account/deposit.vue').default },
      {path: '/withdraw',component: require('./components/Account/withdraw.vue').default },
-
+      /* ====== Profile ====== */
      {path: '/profile',component: require('./components/Profile/profile.vue').default },
+     {path: '/userview/:id',component: require('./components/Profile/userview.vue').default, name :'userview' },
 
      /* transcation */
      {path: '/transactions',component: require('./components/Transaction/transactions.vue').default },
@@ -94,7 +96,8 @@ const routes = [
 
      /* LOans */
      {path: '/loans',component: require('./components/Loan/loans.vue').default },
-     {path: '/activeloans',component: require('./components/Loan/activeLoans.vue').default },
+     {path: '/loan/:id',component: require('./components/Loan/loanDetail.vue').default , name:'loandetail'},
+     {path: '/defaulting',component: require('./components/Loan/defaulting.vue').default },
      {path: '/graph',component: require('./components/graph.vue').default },
      /* School */
      {path: '/schools',component: require('./components/School/schools.vue').default },
@@ -111,6 +114,9 @@ const routes = [
     mode: 'history',
     routes // short for `routes: routes`
   })
+
+  /* Pagination */
+  Vue.component('pagination', require('laravel-vue-pagination'));
 
 /**
  * The following block of code may be used to automatically register your
@@ -134,4 +140,10 @@ Vue.component('example-component', require('./components/ExampleComponent.vue').
 const app = new Vue({
     el: '#app',
     router,
+    data (){
+      return{
+         date : ""
+      }
+    },
+    
 });

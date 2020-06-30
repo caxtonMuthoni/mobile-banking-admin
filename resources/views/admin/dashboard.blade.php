@@ -33,9 +33,12 @@
         </div>
       </div>
     </form>
-
+     
     <!-- Right navbar links -->
     <ul class="navbar-nav ml-auto">
+      <li class="nav-tem">
+         <a href="" class="nav-link">@{{date}}</a>
+      </li>
       <!-- Messages Dropdown Menu -->
       <li class="nav-item dropdown">
         <a class="nav-link" data-toggle="dropdown" href="#">
@@ -123,19 +126,54 @@
       </li>
     
       <li class="nav-item">
-        <a class="nav-link" href="{{ route('logout') }}"
+      <a href="#" class="nav-link" data-toggle="modal" data-target="#modelId"> <i class="fas fa-power-off  text-danger  "></i></a>
+        <!-- <a class="nav-link" href="{{ route('logout') }}"
                                        onclick="event.preventDefault();
                                                      document.getElementById('logout-form').submit();">
                                          <i class="fas fa-power-off  text-danger  "></i>
-          </a>
+          </a> -->
 
-          <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+          <!-- <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
               @csrf
-          </form>
+          </form> -->
       </li>
     </ul>
   </nav>
   <!-- /.navbar -->
+
+  <!-- Logout modal -->
+  <!-- Button trigger modal -->
+  <!-- <button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#modelId">
+    Launch
+  </button> -->
+  
+  <!-- Modal -->
+  <div class="modal fade" id="modelId" tabindex="-1" role="dialog" aria-labelledby="modelTitleId" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+          <div class="modal-header">
+              <h5 class="modal-title text-danger"><i class="fas fa-lock  mr-3  "></i> <strong>End session</strong></h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+         <form action="{{ route('logout') }}" method="post">
+           @csrf
+         <div class="modal-body">
+          <div class="container-fluid">
+            <strong class="text-info">Are you sure you want to logout ?</strong>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" data-dismiss="modal">No,close</button>
+          <button type="submit" class="btn btn-danger">Yes,Logout</button>
+        </div>
+         </form>
+      </div>
+    </div>
+  </div>
+  
+   <!-- Logout modal -->
 
   <!-- Main Sidebar Container -->
   <aside class="main-sidebar sidebar-dark-primary elevation-4">
@@ -150,10 +188,13 @@
       <!-- Sidebar user panel (optional) -->
       <div class="user-panel mt-3 pb-3 mb-3 d-flex">
         <div class="image">
-          <img src="{{asset('dist/img/user2-160x160.jpg')}}" class="img-circle elevation-2" alt="User Image">
+        <?php
+           $avatar = App\Profile::where('UserId',Auth::user()->id)->value('Avatar');
+        ?>
+          <img src="{{asset('images/avatar/'.$avatar)}}" class="img-circle elevation-2" alt="User Image">
         </div>
         <div class="info">
-          <router-link to="/profile" class="d-block">{{Auth::user()->FirstName}}  {{Auth::user()->LastName}}</router-link>
+          <router-link to="/profile">{{Auth::user()->FirstName}}  {{Auth::user()->LastName}}</router-link>
         </div>
       </div>
 
@@ -235,9 +276,9 @@
                 </router-link>
               </li>
               <li class="nav-item">
-                <router-link to="/activeloans" class="nav-link">
+                <router-link to="/defaulting" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>Active Loans</p>
+                  <p>Defaulting Loans</p>
                 </router-link>
               </li>
               <li class="nav-item">

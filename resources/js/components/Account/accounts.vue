@@ -4,7 +4,7 @@
             <div class="col-md-11 ">
                 <div class="card mt-5">
                     <div class="card-header indigo h5"><i class="fas fa-registered    "></i><strong>Registered Accounts</strong> 
-                     <button class="btn btn-success float-right"> <i class="fas fa-user-plus    "></i> Add New</button>
+            
                     </div>
 
                     <div class="card-body">
@@ -161,7 +161,7 @@
                 showCancelButton: true,
                 confirmButtonColor: '#3085d6',
                 cancelButtonColor: '#d33',
-                confirmButtonText: 'Yes, Withdraw'
+                confirmButtonText: 'Yes, Deposit'
                 }).then((result) => {
                      this.form.post('api/directdeposit')
                 .then(()=>{
@@ -170,7 +170,7 @@
                     if (result.value) {
                         Swal.fire(
                         'Trasaction Commited',
-                        'Diposit proccessed successifullly.',
+                        'Deposit proccessed successifullly.',
                         'success'
                         )
                         $('#deposit').modal('hide');

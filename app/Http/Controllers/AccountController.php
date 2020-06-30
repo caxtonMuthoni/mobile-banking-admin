@@ -11,6 +11,7 @@ use AfricasTalking\SDK\AfricasTalking;
 use App\SMS;
 use App\Transaction;
 use Auth;
+use App\Http\Controllers\TransactionController;
 use App\Helpers\Transact;
 use GuzzleHttp\Client;
 use Guzzle\Http\Exception\ClientErrorResponseException;
@@ -131,10 +132,10 @@ class AccountController extends Controller
         $this->validate($request,[
             "MPESATransactionID"=>'required'
         ]);
-        return response()->json([
+        /* return response()->json([
             "status"=>"true",
             'success'=>'Your  deposit was recieved successfully !!!'
-        ]);
+        ]); */
         $username = "caxton";
         $apiKey = "8ZITSV4TN4aRSjH5eYTCKAP6nUaxIfxL8V0xMuueRFNunW7DL5bq1cf6D3878U92";
         $MPESATransactionID = $request->MPESATransactionID;
@@ -170,7 +171,7 @@ class AccountController extends Controller
             $newPhone = "0".substr($phone,4);
             $user = User::where('PhoneNumber',$newPhone)->first();
             $Account = Account::where([['CustomerID','=',$user->id],['AccountNumber','=',$user->NationalID]])->first();
-            $transaction = new Transaction;
+            /* $transaction = new Transaction;
             $transaction->TransactionType = "Deposit";
             $transaction->TransID = $request->MPESATransactionID;
             $transaction->TransAmount = $amount;
@@ -181,9 +182,26 @@ class AccountController extends Controller
             $transaction->MiddleName = $user->MiddleName;
             $transaction->LastName = $user->LastName;
             $transaction->OrgAccountBalance = $Account->CurrentBalance;
-            $transaction->CrtAccountBalance = $Account->CurrentBalance + $amount;
+            $transaction->CrtAccountBalance = $Account->CurrentBalance + $amount; */
+
+            $requestdata = [
+                'TransactionType' => 'deposit',
+                'TransactionDescription' => $request->MPESATransactionID .' via MPESA',
+                'TransID' => $request->MPESATransactionID,
+                'UserId' => $user->id,
+                'AccountNumber' => $Account->AccountNumber,
+                'MSISDN' => $newPhone,
+                'FirstName' => $user->FirstName,
+                'MiddleName' => $user->MiddleName,
+                'LastName' => $user->LastName,
+                'TransAmount' => $amount,
+                'OrgAccountBalance' => $Account->CurrentBalance,
+                'CrtAccountBalance' => $Account->CurrentBalance + $amount,
+            ];
+             $transaction =  new TransactionController;
+             $trans =  $transaction->transact($requestdata);
             
-            if($transaction->save()){
+            if($trans != null){
                 $Account->CurrentBalance = $Account->CurrentBalance + $amount;
                 if($Account->save()){
                     $no = $phone;
@@ -246,6 +264,9 @@ class AccountController extends Controller
          }
          else{
             $error = $datas['response']['Description'];
+            if($error == null){
+                $error = "Oops Please make sure you are connected to internet.";
+            }
             return response()->json([
                 "status"=>"false",
                 'error'=>$error
@@ -316,7 +337,7 @@ class AccountController extends Controller
             $newPhone = "0".substr($phone,4);
             $user = User::where('PhoneNumber',$newPhone)->first();
             $Account = Account::where([['CustomerID','=',$user->id],['AccountNumber','=',$user->NationalID]])->first();
-            $transaction = new Transaction;
+            /* $transaction = new Transaction;
             $transaction->TransactionType = "Withdraw";
             $transaction->TransID = rand(100000,999999);
             $transaction->TransAmount = $amount;
@@ -327,9 +348,26 @@ class AccountController extends Controller
             $transaction->MiddleName = $user->MiddleName;
             $transaction->LastName = $user->LastName;
             $transaction->OrgAccountBalance = $Account->CurrentBalance;
-            $transaction->CrtAccountBalance = $Account->CurrentBalance - $amount;
+            $transaction->CrtAccountBalance = $Account->CurrentBalance - $amount; */
+
+            $datarequest = [
+                'TransactionType' => 'withdraw',
+                'TransactionDescription' => 'withdraw through '.$newPhone,
+                'TransID' => rand(100000,999999),
+                'UserId' => $user->id,
+                'AccountNumber' => $Account->AccountNumber,
+                'MSISDN' => $newPhone,
+                'FirstName' => $user->FirstName,
+                'MiddleName' => $user->MiddleName,
+                'LastName' => $user->LastName,
+                'TransAmount' => $amount,
+                'OrgAccountBalance' => $Account->CurrentBalance,
+                'CrtAccountBalance' => $Account->CurrentBalance - $amount,
+            ];
+             $transaction =  new TransactionController;
+             $trans =  $transaction->transact($datarequest);
             
-            if($transaction->save()){
+            if($trans != null){
                 $Account->CurrentBalance = $Account->CurrentBalance - $amount;
                 if($Account->save()){
                     $no = $phone;
@@ -420,6 +458,9 @@ class AccountController extends Controller
         //attach encoded JSON string to the POST fields
         curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
 
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 50); 
+        curl_setopt($ch, CURLOPT_TIMEOUT, 50); //timeout in seconds
+
         //set the content type to application/json
         curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type:application/json'));
 
@@ -448,19 +489,37 @@ class AccountController extends Controller
         $user = User::where('id',$accountToDeposit->CustomerID)->first();
         $accountToDeposit->CurrentBalance = $accountToDeposit->CurrentBalance + $request->CurrentBal;
         if($accountToDeposit->save()){
-                $transaction = new Transaction;
+                /* $transaction = new Transaction;
                 $transaction->TransactionType = "Direct deposit by ".auth('api')->user()->FirstName.auth('api')->user()->NationalID;
                 $transaction->TransID = rand(100000,999999);
                 $transaction->TransAmount = $request->CurrentBal;
-                $transaction->UserId = $request->id;
+                $transaction->UserId = $user->id;
                 $transaction->AccountNumber = $request->AccountNumber;
-                $transaction->MSISDN = auth('api')->user()->PhoneNumber;
+                $transaction->MSISDN =$user->PhoneNumber;
                 $transaction->FirstName = $user->FirstName;
                 $transaction->MiddleName = $user->MiddleName;
                 $transaction->LastName = $user->LastName;
                 $transaction->OrgAccountBalance = $myBalance;
-                $transaction->CrtAccountBalance = $myBalance + $request->CurrentBal;
-                if($transaction->save()){
+                $transaction->CrtAccountBalance = $myBalance + $request->CurrentBal; */
+
+                $datarequest = [
+                    'TransactionType' => 'deposit',
+                    'TransactionDescription' => 'Direct deposit by '.auth('api')->user()->FirstName." ID: " .auth('api')->user()->NationalID,
+                    'TransID' => rand(100000,999999),
+                    'UserId' => $user->id,
+                    'AccountNumber' => $request->AccountNumber,
+                    'MSISDN' => $user->PhoneNumber,
+                    'FirstName' => $user->FirstName,
+                    'MiddleName' => $user->MiddleName,
+                    'LastName' => $user->LastName,
+                    'TransAmount' => $request->CurrentBal,
+                    'OrgAccountBalance' => $myBalance,
+                    'CrtAccountBalance' => $myBalance + $request->CurrentBal,
+                ];
+                 $transaction =  new TransactionController;
+                 $trans =  $transaction->transact($datarequest);
+
+                if($trans != null){
                     return response()->json([
                         'status'=>'true',
                         "success"=>'deposit proccessed successfully !!!',
@@ -482,19 +541,37 @@ class AccountController extends Controller
         $user = User::where('id',$accountToDeposit->CustomerID)->first();
         $accountToDeposit->CurrentBalance = $accountToDeposit->CurrentBalance - $request->CurrentBal;
         if($accountToDeposit->save()){
-                $transaction = new Transaction;
+               /*  $transaction = new Transaction;
                 $transaction->TransactionType = "Direct withdraw by ".auth('api')->user()->FirstName.auth('api')->user()->NationalID;
                 $transaction->TransID = rand(100000,999999);
                 $transaction->TransAmount = $request->CurrentBal;
-                $transaction->UserId = $request->id;
+                $transaction->UserId = $user->id;
                 $transaction->AccountNumber = $request->AccountNumber;
-                $transaction->MSISDN = auth('api')->user()->PhoneNumber;
+                $transaction->MSISDN = $user->PhoneNumber;
                 $transaction->FirstName = $user->FirstName;
                 $transaction->MiddleName = $user->MiddleName;
                 $transaction->LastName = $user->LastName;
                 $transaction->OrgAccountBalance = $myBalance;
                 $transaction->CrtAccountBalance = $myBalance - $request->CurrentBal;
-                if($transaction->save()){
+ */
+                $datarequest = [
+                    'TransactionType' => 'withdraw',
+                    'TransactionDescription' => 'Direct Withdraw by '.auth('api')->user()->FirstName." ID: " .auth('api')->user()->NationalID,
+                    'TransID' => rand(100000,999999),
+                    'UserId' => $user->id,
+                    'AccountNumber' => $request->AccountNumber,
+                    'MSISDN' => $user->PhoneNumber,
+                    'FirstName' => $user->FirstName,
+                    'MiddleName' => $user->MiddleName,
+                    'LastName' => $user->LastName,
+                    'TransAmount' => $request->CurrentBal,
+                    'OrgAccountBalance' => $myBalance,
+                    'CrtAccountBalance' => $myBalance - $request->CurrentBal,
+                ];
+                 $transaction =  new TransactionController;
+                 $trans =  $transaction->transact($datarequest);
+
+                if($trans != null){
                     return response()->json([
                         'status'=>'true',
                         "success"=>'withdrawal proccessed successfully !!!',
@@ -649,7 +726,7 @@ class AccountController extends Controller
         if($datas["status"]){
             $account->CurrentBalance = $account->CurrentBalance - $request->amount;
             if($account->save()){
-                $transact = new Transact;
+                /* $transact = new Transact;
                 $status = $transact->transact(
                     "airtime Purchase",
                     rand(1000000,96859699365),
@@ -662,9 +739,26 @@ class AccountController extends Controller
                     $user->LastName,
                     $account->CurrentBalance+$request->amount,
                     $account->CurrentBalance
-                  );
+                  ); */
+
+                  $datarequest = [
+                    'TransactionType' => 'airtime',
+                    'TransactionDescription' => 'air time purchase to'.$request->phone,
+                    'TransID' => rand(100000,999999),
+                    'UserId' => $user->id,
+                    'AccountNumber' => $account->AccountNumber,
+                    'MSISDN' => $request->phone,
+                    'FirstName' => $user->FirstName,
+                    'MiddleName' => $user->MiddleName,
+                    'LastName' => $user->LastName,
+                    'TransAmount' => $request->amount,
+                    'OrgAccountBalance' =>  $account->CurrentBalance+$request->amount,
+                    'CrtAccountBalance' => $account->CurrentBalance
+                ];
+                 $transaction =  new TransactionController;
+                 $trans =  $transaction->transact($datarequest);
          
-                  if($status){
+                  if($trans != null){
                       return response()->json([
                        "status"=>"true",
                         "success"=>" You have successifully purchased ". $request->amount. " airtime."
@@ -729,7 +823,7 @@ class AccountController extends Controller
         if($datas["status"]){
             $account->CurrentBalance = $account->CurrentBalance - $request->amount;
             if($account->save()){
-                $transact = new Transact;
+                /* $transact = new Transact;
                 $status = $transact->transact(
                     "PayBill ".$DestinationChannel." Account ".$DestinationAccount,
                     rand(1000000,96859699365),
@@ -742,9 +836,27 @@ class AccountController extends Controller
                     $user->LastName,
                     $account->CurrentBalance+$request->amount,
                     $account->CurrentBalance
-                  );
+                  ); */
+
+                  $datarequest = [
+                    'TransactionType' => 'paybill',
+                    'TransactionDescription' => "PayBill ".$DestinationChannel." Account ".$DestinationAccount,
+                    'TransID' => rand(100000,999999),
+                    'UserId' => $user->id,
+                    'AccountNumber' => $account->AccountNumber,
+                    'MSISDN' => $user->PhoneNumber,
+                    'FirstName' => $user->FirstName,
+                    'MiddleName' => $user->MiddleName,
+                    'LastName' => $user->LastName,
+                    'TransAmount' => $request->amount,
+                    'OrgAccountBalance' =>  $account->CurrentBalance+$request->amount,
+                    'CrtAccountBalance' => $account->CurrentBalance
+                ];
+                 $transaction =  new TransactionController;
+                 $trans =  $transaction->transact($datarequest);
+
          
-                  if($status){
+                  if($trans != null){
                       return response()->json([
                        "status"=>"true",
                         "success"=>" You have successifully paid ". $request->amount. " to PayBill ".$DestinationChannel." to account ".$DestinationAccount,
@@ -788,5 +900,14 @@ class AccountController extends Controller
                 ]);
             }
         }
+    }
+
+    public function usersreport(){
+        $users = User::whereMonth('created_at', date('m'))->count();
+        $users_1 = User::whereMonth('created_at', date('m', strtotime('-1 month', time())))->count();
+        $users_2 = User::whereMonth('created_at', date('m', strtotime('-2 month', time())))->count();
+        $users_3 = User::whereMonth('created_at', date('m', strtotime('-3 month', time())))->count();
+        $users_4 = User::whereMonth('created_at', date('m', strtotime('-4 month', time())))->count();
+        return [$users_4,$users_3,$users_2,$users_1,$users];
     }
 }

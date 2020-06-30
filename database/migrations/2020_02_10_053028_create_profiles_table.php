@@ -19,11 +19,11 @@ class CreateProfilesTable extends Migration
             $table->string('Avatar')->default('default.png');
             $table->boolean('EmploymentStatus')->default(0);
             $table->string('Company')->default('None');
-            $table->string('Occupation');
-            $table->string('AnualIncome');
-            $table->string('MonthlyIncome');
-            $table->string('Bio');
-            $table->string('EducationLevel');
+            $table->string('Occupation')->nullable();
+            $table->string('AnualIncome')->nullable();
+            $table->string('MonthlyIncome')->nullable();
+            $table->string('Bio')->nullable();
+            $table->string('EducationLevel')->nullable();
             $table->timestamps();
         });
     }

@@ -5,6 +5,9 @@
       <div class="container-fluid">
         <!-- Small boxes (Stat box) -->
         <div class="row">
+          <div class="col-md-12">
+             <b class="float-right indigo">DATE : <strong class="blue">{{date}}</strong> TIME: <strong class="blue">{{time}}</strong></b>
+          </div>
           <div class="col-lg-3 col-6">
             <!-- small box -->
            
@@ -600,6 +603,7 @@
 
 <script>
 import LineChart from './LineCharts.js'
+import moment from 'moment'
     export default {
       components: {
           LineChart
@@ -612,7 +616,9 @@ import LineChart from './LineCharts.js'
             usage:'',
             bal:'',
             balance:'',
-            asAt:''
+            asAt:'',
+            date:'',
+            time: ''
           }
         },
         mounted () {
@@ -633,7 +639,7 @@ import LineChart from './LineCharts.js'
                 },
           getBalance(){
             this.$Progress.start()
-           axios.get('api/balance').then(({data})=>{
+           axios.get('api/balanc').then(({data})=>{
              this.balance = data.response.SAPWalletBalance;
              this.asAt = data.response.Date;
            })
@@ -645,9 +651,21 @@ import LineChart from './LineCharts.js'
               this.usage=data.usage;
               this.bal = data.bal
               })
+          },
+
+          getNow: function() {
+                    const today = new Date();
+                    const date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
+                    const time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+                    // const dateTime = "DATE: " + date +' TIME: '+ time;
+                    this.date = date;
+                    this.time = time;
+                
           }
         },
         created() {
+            setInterval(this.getNow, 1000);
+            this.loadTime()
             this.getUsersNumber();
             this.getBalance();
         }

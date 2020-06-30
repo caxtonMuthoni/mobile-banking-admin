@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use App\User;
+use App\Profile;
 class AuthController extends Controller
 {
   
@@ -44,7 +45,12 @@ class AuthController extends Controller
             'email' => $request->email,
             'password' => bcrypt($request->password)
         ]);
-        $user->save();
+         $status = $user->save();
+         if($status){
+             $profile = new Profile();
+             $profile->UserId = $user->id;
+             $profile->save();
+         }
         return response()->json([
              'status'=>"true",
             'message' => 'Successfully created user!'
@@ -64,14 +70,14 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         $request->validate([
-            'email' => 'required|string|email',
+            'PhoneNumber' => 'required|string',
             'password' => 'required|string',
             'remember_me' => 'boolean'
         ]);
-        $credentials = request(['email', 'password']);
+        $credentials = request(['PhoneNumber', 'password']);
         if(!Auth::attempt($credentials))
             return response()->json([
-                'message' => 'Unauthorized'
+                'message' => 'Access Denied'
             ], 401);
         $user = $request->user();
         $tokenResult = $user->createToken('Personal Access Token');

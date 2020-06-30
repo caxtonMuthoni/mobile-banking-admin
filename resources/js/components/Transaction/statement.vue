@@ -44,43 +44,53 @@
             <div class="float-right m-1">
                <a href="#" @click.prevent="printStatement" class="btn btn-primary float-right search"><i class=" mr-2 fas fa-print    "></i> Print</a>
             </div>
-             <table class="table table-bordered table-stripped">
+            
+                         <table class="table table-bordered text-sm table-striped">
                             <thead>
                                 <th>#</th>
-                                 <th>Date</th>
-                                <th>Transaction ID</th>
                                 <th>Description</th>
+                                <th>Transaction ID</th>
                                 <th>Amount</th>
                                 <th>Transcated By</th>
                                 <th>Original Bal</th>
                                 <th>New Bal</th>
+                                <th>Date</th>
                             </thead>
                             <tbody>
                                 <tr v-for="transaction in transactions" :key="transaction.id">
                                     <td>{{transaction.id}}</td>
+                                    <td>{{transaction.description}}</td>
+                                     <td>{{transaction.transactionID}}</td>
+                                    <td>{{transaction.amount}}</td>
+                                    <td>{{transaction.user}}</td>
+                                    <td>{{transaction.original_bal}}</td>
+                                    <td>{{transaction.new_bal}}</td>
                                     <td>{{transaction.created_at | upDate}}</td>
-                                    <td>{{transaction.TransID}}</td>
-                                     <td>{{transaction.TransactionType}}</td>
-                                    <td>{{transaction.TransAmount}}</td>
-                                    <td>{{transaction.FirstName}} {{transaction.Githinji}}</td>
-                                    <td>{{transaction.OrgAccountBalance}}</td>
-                                    <td>{{transaction.CrtAccountBalance}}</td>
-                                    
                                     
       
                                 </tr>
                             </tbody>
                             <tfoot>
                                 <th>#</th>
-                                 <th>Date</th>
-                                <th>Transaction ID</th>
                                 <th>Description</th>
+                                <th>Transaction ID</th>
                                 <th>Amount</th>
                                 <th>Transcated By</th>
                                 <th>Original Bal</th>
                                 <th>New Bal</th>
+                                <th>Date</th>
                             </tfoot>
                         </table>
+          </div>
+          <div class="card-footer" >
+              <table class="table table-striped">
+                  <tbody>
+                      <tr>
+                          <td><strong>Total Balance</strong></td>
+                          <td><strong class="float-right">{{total}}</strong></td>
+                      </tr>
+                  </tbody>
+              </table>
           </div>
         </div>
     </div>
@@ -91,6 +101,7 @@ export default {
              return{
                  user:{},
                  transactions : {},
+                  total: 0,
                  form : new Form({
                   MSISDN: '',
                  })
@@ -104,14 +115,15 @@ export default {
 
               loadUserTransactions(){
                  this.form.post('/api/mytransaction').then(({data})=>{
-                     this.transactions = data.transactions;
-                     this.user = data .user;
+                     this.transactions = data.transactions
+                     this.user = data.user
+                     this.total = data.total
                  })
              },
              loadTransactions(){
+                 $('.card-foote').hide();
                  axios.get('/api/trasactions').then(({data})=>{
-                     this.transactions = data.transactions.data;
-                     this.user = data.user
+                     this.transactions = data.data;
                  })
              }
         },

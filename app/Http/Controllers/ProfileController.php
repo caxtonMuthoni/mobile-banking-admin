@@ -111,6 +111,11 @@ class ProfileController extends Controller
         $profile = Profile::where('UserId',auth('api')->user()->id)->first();
         return $profile;
     }
+    public function showprofile($id)
+    {
+        $profile = Profile::where('userId',$id)->first();
+        return $profile;
+    }
 
     /**
      * Show the form for editing the specified resource.

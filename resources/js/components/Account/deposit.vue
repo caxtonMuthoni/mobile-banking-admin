@@ -202,14 +202,16 @@
                         title :'Request failed.',
                         text : data.error,
                         });
+                         this.$Progress.fail();
                     }else{
                           Swal.fire({
                             icon :'success',
                             title :'Deposit proccessed',
                             text : data.success,
                         });
+                         this.$Progress.finish();
                     }
-                     this.$Progress.finish();
+                    
 
                 }).catch(()=>{
                      this.$Progress.fail();
