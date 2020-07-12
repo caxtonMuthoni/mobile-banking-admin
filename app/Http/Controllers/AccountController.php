@@ -10,32 +10,20 @@ use App\User;
 use AfricasTalking\SDK\AfricasTalking;
 use App\SMS;
 use App\Transaction;
+use App\GroupAccount;
 use Auth;
 use App\Http\Controllers\TransactionController;
+use App\Http\Resources\TransactionCollection;
 use App\Helpers\Transact;
 use GuzzleHttp\Client;
 use Guzzle\Http\Exception\ClientErrorResponseException;
 class AccountController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
+   
     public function index()
     {
         $accunts = Account::all();
         return $accunts;
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
     }
 
     public function topUpSap(Request $request){
@@ -594,6 +582,14 @@ class AccountController extends Controller
             return $validator->errors();
         }
 
+        $accountCount = Account::where([['CustomerID',auth('api')->user()->id],['AccountCode',$request->AccountCode]])->get()->count();
+        if($accountCount > 0){
+            return response()->json([
+                'status' => 'false',
+                'error'=>"You already have a similar account. !!!"
+            ]);
+        }
+
         $accounts  = Account::where('CustomerID',Auth::user()->id)->count();
         if ($accounts >=5) {
             return response()->json([
@@ -604,14 +600,24 @@ class AccountController extends Controller
         $accountNo = Auth::user()->NationalID;
         $accountCode = $request->AccountCode;
         $accountNumber = $accountCode.$accountNo;
+        $userId = Auth::user()->id;
 
         $account = new Account;
         $account->AccountName = $request->AccountName;
         $account->AccountNumber = $accountNumber;
-        $account->CustomerID = Auth::user()->id;
+        $account->AccountCode =  $accountCode;
+        $account->CustomerID = $userId;
         $account->CurrentBalance = 0.0;
         $account->Status = true;
         if($account->save()){
+            if($accountCode == 201){
+                 $groupAccount = new GroupAccount;
+                 $groupAccount->userId = $userId;
+                 $groupAccount->accountId = $account->id;
+                 $groupAccount->role = 'admin';
+                 $groupAccount->status = true;
+                 $groupAccount->save();
+            }
             return response()->json([
                 'status' => 'true',
                 'success' => "Account created successifully !!!"
@@ -665,7 +671,21 @@ class AccountController extends Controller
     public function getUsersAccounts(){
         $userId = auth('api')->user()->id;
         $accounts = Account::where('CustomerID',$userId)->get();
-        return $accounts;
+
+        $groupAccounts = [];
+        foreach($accounts as $account){
+           array_push($groupAccounts,$account);
+        }
+         
+        $groups = GroupAccount::where([['userId',$userId],['status',true]])->get();
+        foreach($groups as $group){
+            if($group->role != 'admin'){
+                $account = Account::find($group->accountId);
+                array_push($groupAccounts,$account);
+            }
+        }
+
+        return $groupAccounts;
     }
 
     /**
@@ -880,7 +900,7 @@ class AccountController extends Controller
              'accountNumber'=>'required | numeric '
          ]);
          $statement = Transaction::where('AccountNumber',$request->accountNumber)->latest()->get();
-         return $statement;
+         return TransactionCollection::collection($statement);
      }
      
     public function destroy($id)
@@ -902,6 +922,166 @@ class AccountController extends Controller
         }
     }
 
+    /* ============================= Other accounts Deposit ============================= */
+    public function depositOtherAccounts(Request $request){
+        // validation
+        $this->validate($request,[
+            'accountId' => 'required | numeric',
+            'amount' => 'required | numeric', 
+        ]);
+
+        $amount = $request->amount;
+        $user = auth('api')->user();
+        $depositAccount = Account::find($request->accountId);
+        $withdrawAccount = Account::where([['CustomerID',$user->id],['AccountCode',200]])->first();
+
+        if($withdrawAccount->CurrentBalance < $amount){
+            return response()->json([
+                "status" => false,
+                "message" => "You have insufficient funds to complete this transaction"
+            ]);
+        }
+
+         $withdrawAccount->CurrentBalance -= $amount;
+
+         if($withdrawAccount->save()){
+            $data = [
+                'TransactionType' => 'transfer',
+                'TransactionDescription' => 'transfer to'.$depositAccount->AccountName,
+                'TransID' => rand(100000,999999),
+                'UserId' => $user->id,
+                'AccountNumber' => $withdrawAccount->AccountNumber,
+                'MSISDN' => $user->PhoneNumber,
+                'FirstName' => $user->FirstName,
+                'MiddleName' => $user->MiddleName,
+                'LastName' => $user->LastName,
+                'TransAmount' => $amount,
+                'OrgAccountBalance' =>  $withdrawAccount->CurrentBalance+$amount,
+                'CrtAccountBalance' => $withdrawAccount->CurrentBalance
+            ];
+            $transaction =  new TransactionController;
+            $trans =  $transaction->transact($data);
+
+            if($trans != null){
+                $depositAccount->CurrentBalance += $amount;
+                if($depositAccount->save()){
+                    $data = [
+                        'TransactionType' => 'deposit',
+                        'TransactionDescription' => 'recieved from'.$withdrawAccount->AccountName,
+                        'TransID' => rand(100000,999999),
+                        'UserId' => $user->id,
+                        'AccountNumber' => $depositAccount->AccountNumber,
+                        'MSISDN' => $user->PhoneNumber,
+                        'FirstName' => $user->FirstName,
+                        'MiddleName' => $user->MiddleName,
+                        'LastName' => $user->LastName,
+                        'TransAmount' => $amount,
+                        'OrgAccountBalance' =>  $depositAccount->CurrentBalance - $amount,
+                        'CrtAccountBalance' => $depositAccount->CurrentBalance
+                    ];
+                    $transaction =  new TransactionController;
+                    $trans =  $transaction->transact($data);
+
+                    if($trans != null){
+                        return response()->json([
+                            "status" => true,
+                            "message" => "Transaction was completed successfully."
+
+                        ]);
+                    }
+                }
+            }
+         }
+        
+    }
+
+    /* ======================================= Withdraw from other accounts to main account ======================================= */
+    public function withdrawFromOtherAccount(Request $request){
+        // validation
+         $this->validate($request,[
+            'accountId' => 'required | numeric',
+            'amount' => 'required | numeric',
+         ]);
+
+
+         $user = auth('api')->user();
+         $amount = $request->amount;
+         $withdrawAccount = Account::where([['id',$request->accountId]])->first();
+         $depositAccount = Account::where([['CustomerID',$user->id],['AccountCode',200]])->first();
+        
+         if($withdrawAccount->AccountCode == 201){
+            $groupUser = GroupAccount::where([['accountId' ,$request->accountId],['userId',$user->id]])->first();
+
+         if($groupUser->role != 'admin'){
+             return response()->json([
+                 'status' => false,
+                 'message' => "Sorry, you are unauthorized to withdraw from this account"
+             ]);
+         }
+         }
+
+
+         if($withdrawAccount->CurrentBalance < $amount){
+            return response()->json([
+                "status" => false,
+                "message" => "You have insufficient funds to complete this transaction"
+            ]);
+        }
+
+        $withdrawAccount->CurrentBalance -= $amount;
+
+        if($withdrawAccount->save()){
+           $data = [
+               'TransactionType' => 'transfer',
+               'TransactionDescription' => 'withdraw to'.$depositAccount->AccountName,
+               'TransID' => rand(100000,999999),
+               'UserId' => $user->id,
+               'AccountNumber' => $withdrawAccount->AccountNumber,
+               'MSISDN' => $user->PhoneNumber,
+               'FirstName' => $user->FirstName,
+               'MiddleName' => $user->MiddleName,
+               'LastName' => $user->LastName,
+               'TransAmount' => $amount,
+               'OrgAccountBalance' =>  $withdrawAccount->CurrentBalance+$amount,
+               'CrtAccountBalance' => $withdrawAccount->CurrentBalance
+           ];
+           $transaction =  new TransactionController;
+           $trans =  $transaction->transact($data);
+
+           if($trans != null){
+               $depositAccount->CurrentBalance += $amount;
+               if($depositAccount->save()){
+                   $data = [
+                       'TransactionType' => 'deposit',
+                       'TransactionDescription' => 'recieved from'.$withdrawAccount->AccountName,
+                       'TransID' => rand(100000,999999),
+                       'UserId' => $user->id,
+                       'AccountNumber' => $depositAccount->AccountNumber,
+                       'MSISDN' => $user->PhoneNumber,
+                       'FirstName' => $user->FirstName,
+                       'MiddleName' => $user->MiddleName,
+                       'LastName' => $user->LastName,
+                       'TransAmount' => $amount,
+                       'OrgAccountBalance' =>  $depositAccount->CurrentBalance - $amount,
+                       'CrtAccountBalance' => $depositAccount->CurrentBalance
+                   ];
+                   $transaction =  new TransactionController;
+                   $trans =  $transaction->transact($data);
+
+                   if($trans != null){
+                       return response()->json([
+                           "status" => true,
+                           "message" => "Transaction was completed successfully."
+
+                       ]);
+                   }
+               }
+           }
+        }
+
+    }
+
+
     public function usersreport(){
         $users = User::whereMonth('created_at', date('m'))->count();
         $users_1 = User::whereMonth('created_at', date('m', strtotime('-1 month', time())))->count();
@@ -910,4 +1090,5 @@ class AccountController extends Controller
         $users_4 = User::whereMonth('created_at', date('m', strtotime('-4 month', time())))->count();
         return [$users_4,$users_3,$users_2,$users_1,$users];
     }
+
 }

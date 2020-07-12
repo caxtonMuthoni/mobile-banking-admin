@@ -224,27 +224,29 @@ class LendController extends Controller
         /* Validation */
         $validator = Validator::make($request->all(),[
             'amount' => 'required | numeric', 
-            'accountId'=>'required',
             'accountNumber' => 'required',
         
         ]);
         if ($validator->fails()){
             return $validator->errors();
         }
+
+        $user = auth('api')->user();
+
         $accountToDeposit = Account::where([['AccountNumber','=',$request->accountNumber]])->first();
         if($accountToDeposit ===  null){
             return response()->json([
-                'status'=>'false',
-                'error'=>'Sorry, the account number you provided is not valid. Please try again. !!!',
+                'status'=>false,
+                'message'=>'Invalid account number. Please try again. !!!',
             ]);
         }
-        $accountToWithdraw = Account::where([['CustomerID','=',Auth::user()->id],['id','=',$request->accountId]])->first();
+        $accountToWithdraw = Account::where([['CustomerID','=',$user->id],['AccountCode','=',200]])->first();
         $amountToTransfer = $request->amount;
         $myBalance = $accountToWithdraw->CurrentBalance;
         if($amountToTransfer > $myBalance){
             return response()->json([
-                'status'=>'false',
-                'error'=>'Sorry, you have insufficient fund to complete the transaction. Please top up and try again !!!',
+                'status'=>false,
+                'message'=>'Sorry, you have insufficient fund to complete the transaction. Please top up and try again !!!',
             ]);
         }
         $accountToWithdraw->CurrentBalance = $myBalance - $amountToTransfer;
@@ -254,35 +256,73 @@ class LendController extends Controller
             $userBal = $accountToWithdraw->CurrentBalance;
             $accountToDeposit->CurrentBalance = $accountToDeposit->CurrentBalance + $amountToTransfer;
             if($accountToDeposit->save()){
-                $transaction = new Transaction;
-                $transaction->TransactionType = "Tranfer to ". $accountToDeposit->AccountName;
-                $transaction->TransID = rand(100000,999999);
-                $transaction->TransAmount = $amountToTransfer;
-                $transaction->UserId = Auth::user()->id;
-                $transaction->AccountNumber = $accountToWithdraw->AccountNumber;
-                $transaction->MSISDN = Auth::user()->PhoneNumber;
-                $transaction->FirstName = Auth::user()->FirstName;
-                $transaction->MiddleName = Auth::user()->MiddleName;
-                $transaction->LastName = Auth::user()->LastName;
-                $transaction->OrgAccountBalance = $myBalance;
-                $transaction->CrtAccountBalance = $myBalance - $amountToTransfer;
-                if($transaction->save()){  
-                    $transaction = new Transaction;
-                    $transaction->TransactionType = "Recieved from ". $accountToWithdraw->AccountName;
-                    $transaction->TransID = rand(100000,999999);
-                    $transaction->TransAmount = $amountToTransfer;
-                    $transaction->UserId = $accountToDeposit->CustomerID;
-                    $transaction->AccountNumber = $accountToDeposit->AccountNumber;
-                    $transaction->MSISDN = $user->PhoneNumber;
-                    $transaction->FirstName = $user->FirstName;
-                    $transaction->MiddleName = $user->MiddleName;
-                    $transaction->LastName = $user->LastName;
-                    $transaction->OrgAccountBalance = $userBal;
-                    $transaction->CrtAccountBalance = $userBal + $amountToTransfer;
-                    if($transaction->save()){
+                // $transaction = new Transaction;
+                // $transaction->TransactionType = "Tranfer to ". $accountToDeposit->AccountName;
+                // $transaction->TransID = rand(100000,999999);
+                // $transaction->TransAmount = $amountToTransfer;
+                // $transaction->UserId = $user->id;
+                // $transaction->AccountNumber = $accountToWithdraw->AccountNumber;
+                // $transaction->MSISDN = $user->PhoneNumber;
+                // $transaction->FirstName = $user->FirstName;
+                // $transaction->MiddleName = $user->MiddleName;
+                // $transaction->LastName = $user->LastName;
+                // $transaction->OrgAccountBalance = $myBalance;
+                // $transaction->CrtAccountBalance = $myBalance - $amountToTransfer;
+
+
+                $datarequest = [
+                    'TransactionType' => 'tranfer',
+                    'TransactionDescription' => "Tranfer to ". $accountToDeposit->AccountName,
+                    'TransID' => rand(100000,999999),
+                    'UserId' => $user->id,
+                    'AccountNumber' => $accountToWithdraw->AccountNumber,
+                    'MSISDN' => $user->PhoneNumber,
+                    'FirstName' => $user->FirstName,
+                    'MiddleName' => $user->MiddleName,
+                    'LastName' => $user->LastName,
+                    'TransAmount' => $amountToTransfer,
+                    'OrgAccountBalance' => $myBalance,
+                    'CrtAccountBalance' => $myBalance - $amountToTransfer,
+                ];
+                 $transaction =  new TransactionController;
+                 $trans =  $transaction->transact($datarequest);
+
+
+                if($trans != null){  
+                    // $transaction = new Transaction;
+                    // $transaction->TransactionType = "Recieved from ". $accountToWithdraw->AccountName;
+                    // $transaction->TransID = rand(100000,999999);
+                    // $transaction->TransAmount = $amountToTransfer;
+                    // $transaction->UserId = $accountToDeposit->CustomerID;
+                    // $transaction->AccountNumber = $accountToDeposit->AccountNumber;
+                    // $transaction->MSISDN = $user->PhoneNumber;
+                    // $transaction->FirstName = $user->FirstName;
+                    // $transaction->MiddleName = $user->MiddleName;
+                    // $transaction->LastName = $user->LastName;
+                    // $transaction->OrgAccountBalance = $userBal;
+                    // $transaction->CrtAccountBalance = $userBal + $amountToTransfer;
+
+                    $datarequest = [
+                        'TransactionType' => 'deposit',
+                        'TransactionDescription' => "Recieved from ". $accountToWithdraw->AccountName,
+                        'TransID' => rand(100000,999999),
+                        'UserId' => $accountToDeposit->CustomerID,
+                        'AccountNumber' => $accountToDeposit->AccountNumber,
+                        'MSISDN' => $user->PhoneNumber,
+                        'FirstName' => $user->FirstName,
+                        'MiddleName' => $user->MiddleName,
+                        'LastName' => $user->LastName,
+                        'TransAmount' => $amountToTransfer,
+                        'OrgAccountBalance' => $userBal,
+                        'CrtAccountBalance' => $userBal + $amountToTransfer,
+                    ];
+                     $transaction =  new TransactionController;
+                     $trans2 =  $transaction->transact($datarequest);
+
+                    if($trans2 != null){
                         return response()->json([
-                            'status'=>'true',
-                            'success'=>'The transfer was posted successifully !!!',
+                            'status'=>true,
+                            'message'=>'Transfer was completed successfully !!!',
                         ]);
                     }
                 }
@@ -290,8 +330,8 @@ class LendController extends Controller
 
         }
         return response()->json([
-            'status'=>'false',
-            'success'=>'Transfer could not be processed fo now. Try again later !!!',
+            'status'=>false,
+            'message'=>'Transfer could not be processed fo now. Try again later !!!',
         ]);
     }
 

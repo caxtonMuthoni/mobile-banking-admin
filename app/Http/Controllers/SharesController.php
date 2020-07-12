@@ -34,7 +34,7 @@ class SharesController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store()
     {
         $userId = auth('api')->user()->id;
         $account = Account::where([['CustomerID','=',$userId],['AccountCode', 200]])->first();
@@ -126,15 +126,23 @@ class SharesController extends Controller
     }
 
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Shares  $shares
-     * @return \Illuminate\Http\Response
-     */
-    public function show(Shares $shares)
+    // Getting user shares
+    public function show()
     {
-        //
+        $userId = auth('api')->user()->id;
+        $shares = Shares::where('userId',$userId)->first();
+        if($shares != null){
+            return response()->json([
+                'status' => true,
+                "shares" => $shares
+            ]);
+        }
+
+
+        return response()->json([
+            'status' => false,
+            "message" => "Please create a shares account."
+        ]);
     }
 
     /**

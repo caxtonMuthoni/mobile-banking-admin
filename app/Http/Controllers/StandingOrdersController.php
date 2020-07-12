@@ -146,6 +146,32 @@ class StandingOrdersController extends Controller
             }
     }
 
+    // Get stanging order
+    public function getMyStandingOrder(){
+        $userId = auth('api')->user()->id;
+        $standingOrders = StandingOrders::where('userId',$userId)->get();
+        return $standingOrders;
+    }
+
+    //  Activate $ Deactivate  standing order
+    public function stopStart(Request $request){
+        $userId = auth('api')->user()->id;
+        $orderId = $request->id;
+        $standingOrder = StandingOrders::where([['userId',$userId],['id',$orderId]])->first();
+        if($standingOrder->status){
+            $standingOrder->status = false;
+        }else{
+            $standingOrder->status = true;
+        }
+
+        if($standingOrder->save()){
+            return response()->json([
+                'status' => true,
+                'message' => "Standing order was updated  successfully."
+            ]);
+        }
+    }
+
     /**
      * Remove the specified resource from storage.
      *

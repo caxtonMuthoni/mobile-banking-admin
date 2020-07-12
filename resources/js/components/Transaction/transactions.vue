@@ -22,10 +22,10 @@
                                     <td>{{transaction.id}}</td>
                                     <td>{{transaction.description}}</td>
                                      <td>{{transaction.transactionID}}</td>
-                                    <td>{{transaction.amount}}</td>
+                                    <td>{{transaction.amount | formatMoney}}</td>
                                     <td>{{transaction.user}}</td>
-                                    <td>{{transaction.original_bal}}</td>
-                                    <td>{{transaction.new_bal}}</td>
+                                    <td>{{transaction.original_bal | formatMoney}}</td>
+                                    <td>{{transaction.new_bal | formatMoney}}</td>
                                     <td>{{transaction.created_at | upDate}}</td>
                                     
       

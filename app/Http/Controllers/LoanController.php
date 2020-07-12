@@ -12,6 +12,7 @@ use App\Http\Resources\TransactionCollection;
 use App\Guarantor;
 use App\LoanPayment;
 use App\Transaction;
+use App\Account;
 
 class LoanController extends Controller
 {
@@ -330,11 +331,15 @@ class LoanController extends Controller
         return  $transactions;
     }
 
-    public function userLoans($id){
+    public function userLoans($id = 0){
+        if($id == 0){
+            $id = auth('api')->user()->id;
+        }
         $loans = Loan::where('userId',$id)->latest()->get();
         return LoanResource::collection($loans);
     }
 
+    /* ============================Get user loan aliases============================ */
     public function getAlias($id){
         $loan = Loan::find($id);
         $starDate = new DateTime($loan->created_at);
@@ -414,6 +419,118 @@ class LoanController extends Controller
 
         //return LoanResource::collection($loans);
     }
+
+    /* ================== Get user active Loan details ==================  */
+    public function getUserActiveLoanDetail(){
+        // 1. Get Current user
+        $userId = auth('api')->user()->id;
+        $id=$loanStatus=$limit=$balance=$aliases = 0;
+
+        // 2. Get user current active loan
+        $loan = Loan::where([['status','!=','complete'],['userId',$userId]])->first();
+        if($loan != null){
+            $id = $loan->id;
+            $balance = $loan->totalRepayable - $loan->paidAmount;
+            $aliases = LoanController::getAlias($loan->id);
+            $loanStatus = $loan->status;
+        }
+
+        // 3. Get user shares to determine limit
+        $shares = Shares::where('userId',$userId)->value('shares');
+        if($shares != null){
+            $limit = $shares * 3;
+        }
+        // 4. return the response
+        return response()->json([
+            'id' => $id,
+            'balance' => $balance,
+            'limit' => $limit,
+            'alias' => $aliases,
+            'loan_status' => $loanStatus
+        ]);
+    }
+    public function payLoan(Request $request){
+        // validation
+      $this->validate($request,[
+          'id' => 'required',
+          'amount' => 'required | numeric'
+      ]);
+
+      $loanId = $request->id;
+      $amount = $request->amount;
+
+      $user = auth('api')->user();
+      $loan = Loan::find($loanId);
+      $account = Account::where('CustomerID',$user->id)->first();
+      $loanBalance = $loan->totalRepayable - $loan->paidAmount;
+      $installment = $loan->installment;
+
+      if($account->CurrentBalance < $amount){
+          return response()->json([
+             'status' => false,
+             'message' => "You have insufficient funds to complete transaction."
+          ]);
+      }else {
+          if($amount > $loanBalance){
+              $amount = $loanBalance;
+          }
+          if(($amount + $loan->paidAmount) == $loan->totalRepayable){
+              $loan->status = "complete";
+          }
+
+          $paidMonths = round(($amount/$installment));
+
+          $currentPaymentDay = new DateTime($loan->nextPayment);
+          $currentPaymentDay->modify('+'.$paidMonths.' months');
+          $nextPayment = $currentPaymentDay->format('Y-m-d h:i:s');
+
+          $account->CurrentBalance -= $amount;
+          if($account->save()){
+            $request = [
+                'TransactionType' => 'transfer',
+                'TransactionDescription' => "Loan repayment",
+                'TransID' => random_int(100000,10000000000),
+                'UserId' => $account->CustomerID,
+                'AccountNumber' => $account->AccountNumber,
+                'MSISDN' => $user->PhoneNumber,
+                'FirstName' => $user->FirstName,
+                'MiddleName' => $user->MiddleName,
+                'LastName' => $user->LastName,
+                'TransAmount' => $amount,
+                'OrgAccountBalance' => $account->CurrentBalance + $amount,
+                'CrtAccountBalance' => $account->CurrentBalance,
+            ];
+
+            $transaction =  new TransactionController;
+            $t = $transaction->transact($request);
+            $loanPayment = new LoanPayment;
+            $loanPayment->loanId = $loan->id;
+            $loanPayment->transactionId = $t->id;
+            $loanPayment->save();
+
+            $loan->nextPayment = $nextPayment;
+            $loan->paidAmount += $amount;
+           if( $loan->save()){
+            return  response()->json([
+                'status' => true,
+                'message' => "Payment was completed successfully.",
+            ]);
+           }
+
+            
+          }
+
+          
+
+      }
+
+    }
+
+
+
+
+
+
 
     /**
      * Remove the specified resource from storage.

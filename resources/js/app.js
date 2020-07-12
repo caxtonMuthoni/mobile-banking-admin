@@ -58,6 +58,28 @@ Vue.filter('time',function(time){
   return moment(time).calendar()
 });
 
+Vue.filter('formatMoney',(moneyString)=>{
+
+  if(parseFloat(moneyString) || parseFloat(moneyString) === 0){
+    let money =  parseFloat(moneyString).toFixed(2);
+    let moneyArray = money.toString().split('.');
+    let integer = moneyArray[0];
+    let decimal = moneyArray[1];
+    let finalString = '';
+    for(var i = integer.length -1; i >= 0; i--){
+           finalString = integer[i] + finalString;
+           if(integer.substr(i).length % 3 == 0 && i != 0){
+               finalString = ',' + finalString;
+           }
+    }
+ 
+    return `${finalString }.${decimal}`;
+  }
+
+  return moneyString;
+   
+});
+
 
 
 
@@ -105,7 +127,13 @@ const routes = [
      {path: '/acounttypes',component: require('./components/AccountType/accountTypes.vue').default },
 
      /*  Reviews */
-     {path: '/reviews', component: require('./components/Review/reviews.vue').default}
+     {path: '/reviews', component: require('./components/Review/reviews.vue').default},
+
+     /*  Investments */
+     {path: '/investments', component: require('./components/Investment/investments.vue').default},
+
+      /*  Loan Types */
+      {path: '/loantypes', component: require('./components/LoanTypes/loan_types.vue').default},
 
   ]
 

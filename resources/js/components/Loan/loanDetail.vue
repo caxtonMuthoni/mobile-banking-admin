@@ -22,22 +22,22 @@
                     <div class="col-md-3 border-right">
                         <strong class="pink border-bottom mb-2"> <i class="fas mr-2 green fa-money-bill    "></i> Financial Info.</strong>
                         <p>Occupation:  <strong>{{ profile.Occupation }}</strong></p>
-                        <p>Monthly Income:  <strong>{{ profile.MonthlyIncome }}</strong></p>
-                        <p>Annual Income:  <strong>{{ profile.AnualIncome }}</strong></p>
+                        <p>Monthly Income:  <strong>{{ profile.MonthlyIncome | formatMoney}}</strong></p>
+                        <p>Annual Income:  <strong>{{ profile.AnualIncome | formatMoney}}</strong></p>
                     </div>
                     <div class="col-md-5 border-right">
                         <strong class="purple border-bottom mb-2"> <i class="fas orange mr-2 fa-money-bill-wave    "></i> Loan Info.</strong>
                         <div class="row">
                             <div class="col-md-6">
-                                <p>Amount:  <strong>{{ loan.amount }}</strong></p>
-                                <p>Installment:  <strong>{{ loan.installment }}</strong></p>
+                                <p>Amount:  <strong>{{ loan.amount | formatMoney}}</strong></p>
+                                <p>Installment:  <strong>{{ loan.installment | formatMoney}}</strong></p>
                                 <p>Period:  <strong>{{ loan.period }} months</strong></p>
                             </div>
 
                             <div class="col-md-6">
-                                <p>Total Amt:  <strong>{{ loan.totalRepayable }}</strong></p>
-                                <p>Aliases:  <strong>{{ loan.alias }}</strong></p>
-                                <p>Interest:  <strong>{{ loan.interest }} % p/M</strong></p>
+                                <p>Total Amt:  <strong>{{ loan.totalRepayable | formatMoney }}</strong></p>
+                                <p>Aliases:  <strong>{{ loan.alias | formatMoney }}</strong></p>
+                                <p>Interest:  <strong>{{ loan.interest | formatMoney}} % p/M</strong></p>
                             </div>
                         </div>
                     </div>
@@ -87,10 +87,10 @@
                                     <td>{{transaction.id}}</td>
                                     <td>{{transaction.description}}</td>
                                      <td>{{transaction.transactionID}}</td>
-                                    <td>{{transaction.amount}}</td>
+                                    <td>{{transaction.amount | formatMoney}}</td>
                                     <td>{{transaction.user}}</td>
-                                    <td>{{transaction.original_bal}}</td>
-                                    <td>{{transaction.new_bal}}</td>
+                                    <td>{{transaction.original_bal | formatMoney}}</td>
+                                    <td>{{transaction.new_bal | formatMoney}}</td>
                                     <td>{{transaction.created_at | upDate}}</td>
                                          
                                 </tr>

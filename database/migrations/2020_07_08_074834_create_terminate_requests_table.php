@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateGroupAccountsTable extends Migration
+class CreateTerminateRequestsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,11 +13,11 @@ class CreateGroupAccountsTable extends Migration
      */
     public function up()
     {
-        Schema::create('group_accounts', function (Blueprint $table) {
+        Schema::create('terminate_requests', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->string('accountId');
-            $table->string('userId');
-            $table->string('role')->default('member');
+            $table->integer('userId');
+            $table->integer('investmentId');
+            $table->text('reason');
             $table->boolean('status')->default(false);
             $table->timestamps();
         });
@@ -30,6 +30,6 @@ class CreateGroupAccountsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('group_accounts');
+        Schema::dropIfExists('terminate_requests');
     }
 }

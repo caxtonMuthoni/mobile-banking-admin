@@ -61,10 +61,10 @@
                                      <td><b>{{ loan.loanId }}</b></td>
                                      <td>{{ loan.borrower }}</td>
                                      <td>{{ loan.loanType }}</td>
-                                     <td>{{ loan.borrowedAmount }}</td>
-                                     <td>{{ loan.alias }}</td>
-                                     <td>{{ loan.totalRepayable }}</td>
-                                     <td>{{ loan.paidAmount }}</td>
+                                     <td>{{ loan.borrowedAmount | formatMoney}}</td>
+                                     <td>{{ loan.alias | formatMoney}}</td>
+                                     <td>{{ loan.totalRepayable | formatMoney }}</td>
+                                     <td>{{ loan.paidAmount | formatMoney}}</td>
                                      <td v-show="loan.isProcessed"><span class="badge badge-success badge-sm">processed</span></td>
                                      <td v-show="!loan.isProcessed"><span class="badge badge-danger badge-sm">pending</span></td>
                                      <td v-show="loan.status == 'pending'"><span class="badge badge-primary badge-sm">Pending</span></td>

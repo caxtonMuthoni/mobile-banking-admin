@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\LoanType;
+use App\Loan;
 use Illuminate\Http\Request;
 
 class LoanTypeController extends Controller
@@ -126,8 +127,25 @@ class LoanTypeController extends Controller
      * @param  \App\LoanType  $loanType
      * @return \Illuminate\Http\Response
      */
-    public function destroy(LoanType $loanType)
+    public function destroy($id)
     {
-        //
+        $loanType = LoanType::find($id);
+        $loans = Loan::where('loanType',$loanType->type)->get()->count();
+        
+        if($loans > 0){
+            return response()->json([
+                'status' => false,
+                'message' => "Oops, loans of this type already exists."
+            ]);
+        }
+        else{
+          if ( $loanType->delete()){
+            return response()->json([
+                'status' => true,
+                'message' => "Loan type was deleted successfully."
+            ]);
+           }
+        }
+        
     }
 }

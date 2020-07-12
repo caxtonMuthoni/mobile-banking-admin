@@ -49,7 +49,7 @@ class ExecuteLoanPayment extends Command
            $account = Account::where('CustomerID',$loan->userId)->first();
            $user = User::find($loan->userId);
            $executionDate = new DateTime($loan->nextPayment);
-           $today = new DateTime('now');
+           $today = new DateTime('now'); 
            $installment = $loan->installment;
            $originalBal = $account->CurrentBalance;
            $isComplete = false;
@@ -62,7 +62,7 @@ class ExecuteLoanPayment extends Command
 
 
            $diff = $executionDate->diff($today)->format('%d');
-           echo($diff);
+           
            if($diff <= 0){
                $accountBal = $account->CurrentBalance;
                if ($accountBal > 0) {

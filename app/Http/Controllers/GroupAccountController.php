@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use App\GroupAccount;
 use Illuminate\Http\Request;
 use App\Account;
+use App\Profile;
+use App\User;
+use  App\Http\Resources\GroupAccountResource;
 
 class GroupAccountController extends Controller
 {
@@ -27,13 +30,7 @@ class GroupAccountController extends Controller
     {
         //
     }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
+/* ============================= Join Group Request ============================= */
     public function store(Request $request)
     {
         //validation
@@ -79,48 +76,61 @@ class GroupAccountController extends Controller
     }
 
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\GroupAccount  $groupAccount
-     * @return \Illuminate\Http\Response
-     */
-    public function show(GroupAccount $groupAccount)
-    {
-        //
+    /* ============================= User group accounts ============================= */
+    public function getuserGroupAccounts(){
+        $userId = auth('api')->user()->id;
+        $groupAccounts = GroupAccount::where('userId',$userId)->get();
+        return GroupAccountResource::collection($groupAccounts);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\GroupAccount  $groupAccount
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(GroupAccount $groupAccount)
-    {
-        //
-    }
+     /* ============================= Get Account By Acccount number ============================= */
+     public function getAcountByAccountNumber(Request $request){
+        //  validation
+        $this->validate($request,[
+            'AccountNumber' => 'required'
+        ]);
+        $account = Account::where('AccountNumber',$request->AccountNumber)->first();
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\GroupAccount  $groupAccount
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, GroupAccount $groupAccount)
-    {
-        //
-    }
+        if($account != null){
+            return response()->json([
+                'status' => true,
+                'account' => $account,
+            ]);
+        }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\GroupAccount  $groupAccount
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(GroupAccount $groupAccount)
-    {
-        //
-    }
+        return response()->json([
+            'status' => false,
+            'message' => "The account does not exixts",
+        ]);
+     }
+
+     /* ============================= Get Group Members ============================= */
+     public function getGroupMembers(Request $request){
+        //  validation
+        $this->validate($request,[
+            'accountId' => 'required | numeric',
+        ]);
+        $members = GroupAccount::where('accountId',$request->accountId)->get();
+        $groupMembers = [];
+        foreach($members as $member){
+           $user = User::find($member->userId);
+           $profile = Profile::where('UserId',$user->id)->first();
+           $json = [
+               'id' =>  $member->id,
+               'userId'=> $member->userId,
+               'name' => $user->FirstName.' '.$user->LastName,
+               'nationalId' => $user->NationalID,
+               'role' => $member->role,
+               'joined_at' => $member->created_at,
+               'status' => $member->status,
+               'avatar' => $profile->Avatar,
+           ];
+           array_push($groupMembers,$json);
+        }
+
+
+
+        return $groupMembers;
+     }
+    
 }

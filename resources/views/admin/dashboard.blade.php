@@ -276,6 +276,12 @@
                 </router-link>
               </li>
               <li class="nav-item">
+                <router-link to="/loantypes" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Loan Types</p>
+                </router-link>
+              </li>
+              <li class="nav-item">
                 <router-link to="/defaulting" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Defaulting Loans</p>
@@ -289,6 +295,25 @@
               </li>
             </ul>
           </li>
+
+          <li class="nav-item has-treeview">
+            <a href="#" class="nav-link">
+              <i class="nav-icon fas fa-edit pink"></i>
+              <p>
+                Investments
+                <i class="fas fa-angle-left right"></i>
+              </p>
+            </a>
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <router-link to="/investments" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Investment Management</p>
+                </router-link>
+              </li>
+            </ul>
+          </li>
+
           <li class="nav-item has-treeview">
             <a href="#" class="nav-link">
             <i class="fa fa-users nav-icon orange" aria-hidden="true"></i>
@@ -313,29 +338,7 @@
               
             </ul>
           </li>
-          <li class="nav-item has-treeview">
-            <a href="#" class="nav-link">
-              <i class="nav-icon fas fa-edit pink"></i>
-              <p>
-                Messages
-                <i class="fas fa-angle-left right"></i>
-              </p>
-            </a>
-            <ul class="nav nav-treeview">
-              <li class="nav-item">
-                <a href="pages/forms/general.html" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Read messages</p>
-                </a>
-              </li>
-              <li class="nav-item">
-                <a href="pages/forms/advanced.html" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Unread Messages</p>
-                </a>
-              </li>
-            </ul>
-          </li>
+          
           <li class="nav-item has-treeview">
             <a href="#" class="nav-link">
               <i class="nav-icon fas fa-table teal"></i>

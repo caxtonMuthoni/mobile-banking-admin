@@ -3434,6 +3434,140 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
+/***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/Investment/investments.vue?vue&type=script&lang=js&":
+/*!*********************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/Investment/investments.vue?vue&type=script&lang=js& ***!
+  \*********************************************************************************************************************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+/* harmony default export */ __webpack_exports__["default"] = ({
+  data: function data() {
+    return {
+      investments: {},
+      form: new Form({
+        investmentId: ''
+      })
+    };
+  },
+  methods: {
+    terminateInvestment: function terminateInvestment(id) {
+      var _this = this;
+
+      this.form.investmentId = id;
+      Swal.fire({
+        title: 'Are you sure?',
+        text: "You won't be able to reverse this process.",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, terminate'
+      }).then(function (result) {
+        _this.form.post("api/terminate").then(function (data) {
+          Fire.$emit('investmentupdate');
+
+          _this.$Progress.finish();
+
+          if (result.value) {
+            if (data.data.status) {
+              Swal.fire('Success', data.data.message, 'success');
+            } else {
+              Swal.fire({
+                title: 'Termination Error',
+                text: data.data.message,
+                icon: 'error'
+              });
+            }
+          }
+        })["catch"](function () {
+          _this.$Progress.fail();
+        });
+      });
+    },
+    getInvestMents: function getInvestMents() {
+      var _this2 = this;
+
+      this.$Progress.start();
+      axios.get('/api/investments').then(function (data) {
+        _this2.investments = data.data.data;
+
+        _this2.$Progress.finish();
+      })["catch"](function (e) {
+        _this2.$Progress.fali();
+
+        console.log(e);
+      });
+    }
+  },
+  created: function created() {
+    var _this3 = this;
+
+    this.getInvestMents();
+    Fire.$on('investmentupdate', function () {
+      _this3.getInvestMents();
+    });
+  }
+});
+
+/***/ }),
+
 /***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/Loan/defaulting.vue?vue&type=script&lang=js&":
 /*!**************************************************************************************************************************************************************************!*\
   !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/Loan/defaulting.vue?vue&type=script&lang=js& ***!
@@ -3997,6 +4131,264 @@ __webpack_require__.r(__webpack_exports__);
   },
   created: function created() {
     this.loadLoans();
+  }
+});
+
+/***/ }),
+
+/***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/LoanTypes/loan_types.vue?vue&type=script&lang=js&":
+/*!*******************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/LoanTypes/loan_types.vue?vue&type=script&lang=js& ***!
+  \*******************************************************************************************************************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+/* harmony default export */ __webpack_exports__["default"] = ({
+  data: function data() {
+    return {
+      loantypes: {},
+      isUpdating: false,
+      form: new Form({
+        id: '',
+        type: "",
+        interest: "",
+        max_amount: "",
+        max_period: ""
+      })
+    };
+  },
+  methods: {
+    deleteLoanType: function deleteLoanType(id) {
+      var _this = this;
+
+      Swal.fire({
+        title: 'Are you sure?',
+        text: "You won't be able to reverse this process.",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, Delete it'
+      }).then(function (result) {
+        axios.get("api/deleteloantype/".concat(id)).then(function (data) {
+          Fire.$emit('loantypeUpdate');
+
+          _this.$Progress.finish();
+
+          if (result.value) {
+            if (data.data.status) {
+              Swal.fire('Success', data.data.message, 'success');
+            } else {
+              Swal.fire({
+                title: 'Deletion Error',
+                text: data.data.message,
+                icon: 'error'
+              });
+            }
+          }
+        })["catch"](function () {
+          _this.$Progress.fail();
+        });
+      });
+    },
+    updateLoanType: function updateLoanType() {
+      var _this2 = this;
+
+      this.$Progress.start();
+      var id = this.form.id;
+      this.form.post("api/updateloantype/".concat(id)).then(function (data) {
+        Toast.fire({
+          icon: 'success',
+          title: data.data.message
+        });
+        Fire.$emit('loantypeUpdate');
+
+        _this2.$Progress.finish();
+
+        _this2.form.reset();
+
+        $('#loan-type-modal').modal('hide');
+      })["catch"](function (e) {
+        _this2.$Progress.fail();
+      });
+    },
+    addLoanType: function addLoanType() {
+      var _this3 = this;
+
+      this.$Progress.start();
+      this.form.post('api/addloantype').then(function (data) {
+        Toast.fire({
+          icon: 'success',
+          title: data.data.message
+        });
+        Fire.$emit('loantypeUpdate');
+
+        _this3.$Progress.finish();
+
+        _this3.form.reset();
+
+        $('#loan-type-modal').modal('hide');
+      })["catch"](function (e) {
+        _this3.$Progress.fail();
+      });
+    },
+    showModal: function showModal(isUpdating, type) {
+      if (isUpdating) {
+        this.isUpdating = true;
+        this.form.fill(type);
+        this.form.max_amount = type.maxAmount;
+        this.form.max_period = type.maxPeriod;
+      } else {
+        this.isUpdating = false;
+      }
+
+      $('#loan-type-modal').modal('show');
+    },
+    getLoanTypes: function getLoanTypes() {
+      var _this4 = this;
+
+      axios.get('api/loantypes').then(function (data) {
+        _this4.loantypes = data.data;
+      })["catch"](function (e) {
+        console.log(e);
+      });
+    }
+  },
+  created: function created() {
+    var _this5 = this;
+
+    this.getLoanTypes();
+    Fire.$on('loantypeUpdate', function () {
+      _this5.getLoanTypes();
+    });
   }
 });
 
@@ -96922,7 +97314,11 @@ var render = function() {
                       _vm._v(" "),
                       _c("td", [_vm._v(_vm._s(account.AccountName))]),
                       _vm._v(" "),
-                      _c("td", [_vm._v(_vm._s(account.CurrentBalance))]),
+                      _c("td", [
+                        _vm._v(
+                          _vm._s(_vm._f("formatMoney")(account.CurrentBalance))
+                        )
+                      ]),
                       _vm._v(" "),
                       _c(
                         "td",
@@ -100056,6 +100452,212 @@ render._withStripped = true
 
 /***/ }),
 
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/Investment/investments.vue?vue&type=template&id=b6178e22&":
+/*!*************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/Investment/investments.vue?vue&type=template&id=b6178e22& ***!
+  \*************************************************************************************************************************************************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "render", function() { return render; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return staticRenderFns; });
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c("div", { staticClass: "container" }, [
+    _c("div", { staticClass: "card text-left" }, [
+      _c("div", { staticClass: "card-body" }, [
+        _vm._m(0),
+        _vm._v(" "),
+        _c("div", { staticClass: "card-body" }, [
+          _c("table", { staticClass: "table table-striped" }, [
+            _vm._m(1),
+            _vm._v(" "),
+            _c(
+              "tbody",
+              _vm._l(_vm.investments, function(investment) {
+                return _c("tr", { key: investment.id }, [
+                  _c("td", [_vm._v(_vm._s(investment.id))]),
+                  _vm._v(" "),
+                  _c("td", [_vm._v(_vm._s(investment.user))]),
+                  _vm._v(" "),
+                  _c("td", [
+                    _vm._v(_vm._s(_vm._f("formatMoney")(investment.amount)))
+                  ]),
+                  _vm._v(" "),
+                  _c("td", [_vm._v(_vm._s(investment.duration) + " months")]),
+                  _vm._v(" "),
+                  _c("td", [
+                    _vm._v(
+                      _vm._s(_vm._f("upDate")(investment.termination_date))
+                    )
+                  ]),
+                  _vm._v(" "),
+                  _c("td", [
+                    _vm._v(_vm._s(_vm._f("formatMoney")(investment.total_pay)))
+                  ]),
+                  _vm._v(" "),
+                  _c("td", [
+                    _vm._v(_vm._s(_vm._f("upDate")(investment.created_at)))
+                  ]),
+                  _vm._v(" "),
+                  _c("td", [
+                    _c(
+                      "a",
+                      {
+                        directives: [
+                          {
+                            name: "show",
+                            rawName: "v-show",
+                            value: investment.status,
+                            expression: "investment.status"
+                          }
+                        ],
+                        staticClass: "btn btn-success btn-sm",
+                        attrs: { href: "" }
+                      },
+                      [_vm._v("active")]
+                    ),
+                    _vm._v(" "),
+                    _c(
+                      "a",
+                      {
+                        directives: [
+                          {
+                            name: "show",
+                            rawName: "v-show",
+                            value: !investment.status,
+                            expression: "!investment.status"
+                          }
+                        ],
+                        staticClass: "btn btn-danger btn-sm",
+                        attrs: { href: "" }
+                      },
+                      [_vm._v("closed")]
+                    )
+                  ]),
+                  _vm._v(" "),
+                  _c("td", [
+                    _c(
+                      "a",
+                      {
+                        directives: [
+                          {
+                            name: "show",
+                            rawName: "v-show",
+                            value: investment.status,
+                            expression: "investment.status"
+                          }
+                        ],
+                        staticClass: "btn btn-primary btn-sm",
+                        attrs: { href: "" },
+                        on: {
+                          click: function($event) {
+                            $event.preventDefault()
+                            return _vm.terminateInvestment(investment.id)
+                          }
+                        }
+                      },
+                      [_vm._v("terminate")]
+                    ),
+                    _vm._v(" "),
+                    _c(
+                      "a",
+                      {
+                        directives: [
+                          {
+                            name: "show",
+                            rawName: "v-show",
+                            value: !investment.status,
+                            expression: "!investment.status"
+                          }
+                        ],
+                        staticClass: "btn btn-warning btn-sm",
+                        attrs: { disabled: "", href: "#" }
+                      },
+                      [_vm._v("terminated")]
+                    )
+                  ])
+                ])
+              }),
+              0
+            ),
+            _vm._v(" "),
+            _vm._m(2)
+          ])
+        ])
+      ])
+    ])
+  ])
+}
+var staticRenderFns = [
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("h4", { staticClass: "card-title pink" }, [
+      _c("i", { staticClass: "fas fa-edit    " }),
+      _c("strong", [_vm._v("Customer Investments")])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("thead", [
+      _c("th", [_vm._v("#")]),
+      _vm._v(" "),
+      _c("th", [_vm._v("Customer")]),
+      _vm._v(" "),
+      _c("th", [_vm._v("Amount")]),
+      _vm._v(" "),
+      _c("th", [_vm._v("Duration")]),
+      _vm._v(" "),
+      _c("th", [_vm._v("Termination Date")]),
+      _vm._v(" "),
+      _c("th", [_vm._v("Total Pay")]),
+      _vm._v(" "),
+      _c("th", [_vm._v("Created at")]),
+      _vm._v(" "),
+      _c("th", [_vm._v("Status")]),
+      _vm._v(" "),
+      _c("th", [_vm._v("Action")])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("tfoot", [
+      _c("th", [_vm._v("#")]),
+      _vm._v(" "),
+      _c("th", [_vm._v("Customer")]),
+      _vm._v(" "),
+      _c("th", [_vm._v("Amount")]),
+      _vm._v(" "),
+      _c("th", [_vm._v("Duration")]),
+      _vm._v(" "),
+      _c("th", [_vm._v("Termination Date")]),
+      _vm._v(" "),
+      _c("th", [_vm._v("Total Pay")]),
+      _vm._v(" "),
+      _c("th", [_vm._v("Created at")]),
+      _vm._v(" "),
+      _c("th", [_vm._v("Status")]),
+      _vm._v(" "),
+      _c("th", [_vm._v("Action")])
+    ])
+  }
+]
+render._withStripped = true
+
+
+
+/***/ }),
+
 /***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/Loan/defaulting.vue?vue&type=template&id=331bf0e5&":
 /*!******************************************************************************************************************************************************************************************************************!*\
   !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/Loan/defaulting.vue?vue&type=template&id=331bf0e5& ***!
@@ -100176,13 +100778,25 @@ var render = function() {
                       _vm._v(" "),
                       _c("td", [_vm._v(_vm._s(loan.loanType))]),
                       _vm._v(" "),
-                      _c("td", [_vm._v(_vm._s(loan.borrowedAmount))]),
+                      _c("td", [
+                        _vm._v(
+                          _vm._s(_vm._f("formatMoney")(loan.borrowedAmount))
+                        )
+                      ]),
                       _vm._v(" "),
-                      _c("td", [_vm._v(_vm._s(loan.alias))]),
+                      _c("td", [
+                        _vm._v(_vm._s(_vm._f("formatMoney")(loan.alias)))
+                      ]),
                       _vm._v(" "),
-                      _c("td", [_vm._v(_vm._s(loan.totalRepayable))]),
+                      _c("td", [
+                        _vm._v(
+                          _vm._s(_vm._f("formatMoney")(loan.totalRepayable))
+                        )
+                      ]),
                       _vm._v(" "),
-                      _c("td", [_vm._v(_vm._s(loan.paidAmount))]),
+                      _c("td", [
+                        _vm._v(_vm._s(_vm._f("formatMoney")(loan.paidAmount)))
+                      ]),
                       _vm._v(" "),
                       _c(
                         "td",
@@ -100507,12 +101121,16 @@ var render = function() {
             _vm._v(" "),
             _c("p", [
               _vm._v("Monthly Income:  "),
-              _c("strong", [_vm._v(_vm._s(_vm.profile.MonthlyIncome))])
+              _c("strong", [
+                _vm._v(_vm._s(_vm._f("formatMoney")(_vm.profile.MonthlyIncome)))
+              ])
             ]),
             _vm._v(" "),
             _c("p", [
               _vm._v("Annual Income:  "),
-              _c("strong", [_vm._v(_vm._s(_vm.profile.AnualIncome))])
+              _c("strong", [
+                _vm._v(_vm._s(_vm._f("formatMoney")(_vm.profile.AnualIncome)))
+              ])
             ])
           ]),
           _vm._v(" "),
@@ -100523,12 +101141,16 @@ var render = function() {
               _c("div", { staticClass: "col-md-6" }, [
                 _c("p", [
                   _vm._v("Amount:  "),
-                  _c("strong", [_vm._v(_vm._s(_vm.loan.amount))])
+                  _c("strong", [
+                    _vm._v(_vm._s(_vm._f("formatMoney")(_vm.loan.amount)))
+                  ])
                 ]),
                 _vm._v(" "),
                 _c("p", [
                   _vm._v("Installment:  "),
-                  _c("strong", [_vm._v(_vm._s(_vm.loan.installment))])
+                  _c("strong", [
+                    _vm._v(_vm._s(_vm._f("formatMoney")(_vm.loan.installment)))
+                  ])
                 ]),
                 _vm._v(" "),
                 _c("p", [
@@ -100540,17 +101162,28 @@ var render = function() {
               _c("div", { staticClass: "col-md-6" }, [
                 _c("p", [
                   _vm._v("Total Amt:  "),
-                  _c("strong", [_vm._v(_vm._s(_vm.loan.totalRepayable))])
+                  _c("strong", [
+                    _vm._v(
+                      _vm._s(_vm._f("formatMoney")(_vm.loan.totalRepayable))
+                    )
+                  ])
                 ]),
                 _vm._v(" "),
                 _c("p", [
                   _vm._v("Aliases:  "),
-                  _c("strong", [_vm._v(_vm._s(_vm.loan.alias))])
+                  _c("strong", [
+                    _vm._v(_vm._s(_vm._f("formatMoney")(_vm.loan.alias)))
+                  ])
                 ]),
                 _vm._v(" "),
                 _c("p", [
                   _vm._v("Interest:  "),
-                  _c("strong", [_vm._v(_vm._s(_vm.loan.interest) + " % p/M")])
+                  _c("strong", [
+                    _vm._v(
+                      _vm._s(_vm._f("formatMoney")(_vm.loan.interest)) +
+                        " % p/M"
+                    )
+                  ])
                 ])
               ])
             ])
@@ -100787,13 +101420,21 @@ var render = function() {
                   _vm._v(" "),
                   _c("td", [_vm._v(_vm._s(transaction.transactionID))]),
                   _vm._v(" "),
-                  _c("td", [_vm._v(_vm._s(transaction.amount))]),
+                  _c("td", [
+                    _vm._v(_vm._s(_vm._f("formatMoney")(transaction.amount)))
+                  ]),
                   _vm._v(" "),
                   _c("td", [_vm._v(_vm._s(transaction.user))]),
                   _vm._v(" "),
-                  _c("td", [_vm._v(_vm._s(transaction.original_bal))]),
+                  _c("td", [
+                    _vm._v(
+                      _vm._s(_vm._f("formatMoney")(transaction.original_bal))
+                    )
+                  ]),
                   _vm._v(" "),
-                  _c("td", [_vm._v(_vm._s(transaction.new_bal))]),
+                  _c("td", [
+                    _vm._v(_vm._s(_vm._f("formatMoney")(transaction.new_bal)))
+                  ]),
                   _vm._v(" "),
                   _c("td", [
                     _vm._v(_vm._s(_vm._f("upDate")(transaction.created_at)))
@@ -101212,13 +101853,25 @@ var render = function() {
                       _vm._v(" "),
                       _c("td", [_vm._v(_vm._s(loan.loanType))]),
                       _vm._v(" "),
-                      _c("td", [_vm._v(_vm._s(loan.borrowedAmount))]),
+                      _c("td", [
+                        _vm._v(
+                          _vm._s(_vm._f("formatMoney")(loan.borrowedAmount))
+                        )
+                      ]),
                       _vm._v(" "),
-                      _c("td", [_vm._v(_vm._s(loan.alias))]),
+                      _c("td", [
+                        _vm._v(_vm._s(_vm._f("formatMoney")(loan.alias)))
+                      ]),
                       _vm._v(" "),
-                      _c("td", [_vm._v(_vm._s(loan.totalRepayable))]),
+                      _c("td", [
+                        _vm._v(
+                          _vm._s(_vm._f("formatMoney")(loan.totalRepayable))
+                        )
+                      ]),
                       _vm._v(" "),
-                      _c("td", [_vm._v(_vm._s(loan.paidAmount))]),
+                      _c("td", [
+                        _vm._v(_vm._s(_vm._f("formatMoney")(loan.paidAmount)))
+                      ]),
                       _vm._v(" "),
                       _c(
                         "td",
@@ -101459,6 +102112,565 @@ var staticRenderFns = [
       _c("th", [_vm._v("Status")]),
       _vm._v(" "),
       _c("th")
+    ])
+  }
+]
+render._withStripped = true
+
+
+
+/***/ }),
+
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/LoanTypes/loan_types.vue?vue&type=template&id=d68d3c8a&":
+/*!***********************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/LoanTypes/loan_types.vue?vue&type=template&id=d68d3c8a& ***!
+  \***********************************************************************************************************************************************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "render", function() { return render; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return staticRenderFns; });
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c("div", { staticClass: "container" }, [
+    _c("div", { staticClass: "card text-left" }, [
+      _c("div", { staticClass: "card-body" }, [
+        _vm._m(0),
+        _vm._v(" "),
+        _c(
+          "button",
+          {
+            staticClass: "btn btn-sm float-right btn-success",
+            on: {
+              click: function($event) {
+                $event.preventDefault()
+                return _vm.showModal(false)
+              }
+            }
+          },
+          [
+            _c("i", {
+              staticClass: "fa fa-plus mr-2",
+              attrs: { "aria-hidden": "true" }
+            }),
+            _vm._v("Add New")
+          ]
+        ),
+        _vm._v(" "),
+        _c("div", { staticClass: "card-body" }, [
+          _c("table", { staticClass: "table table-striped" }, [
+            _vm._m(1),
+            _vm._v(" "),
+            _c(
+              "tbody",
+              _vm._l(_vm.loantypes, function(loantype) {
+                return _c("tr", { key: loantype.id }, [
+                  _c("td", [_vm._v(_vm._s(loantype.id))]),
+                  _vm._v(" "),
+                  _c("td", [_vm._v(_vm._s(loantype.type))]),
+                  _vm._v(" "),
+                  _c("td", [
+                    _vm._v(
+                      _vm._s(_vm._f("formatMoney")(loantype.interest)) + " %"
+                    )
+                  ]),
+                  _vm._v(" "),
+                  _c("td", [_vm._v(_vm._s(loantype.maxPeriod) + " months")]),
+                  _vm._v(" "),
+                  _c("td", [
+                    _vm._v(_vm._s(_vm._f("formatMoney")(loantype.maxAmount)))
+                  ]),
+                  _vm._v(" "),
+                  _c("td", [
+                    _c(
+                      "a",
+                      {
+                        staticClass: "btn btn-sm btn-primary",
+                        attrs: { href: "" },
+                        on: {
+                          click: function($event) {
+                            $event.preventDefault()
+                            return _vm.showModal(true, loantype)
+                          }
+                        }
+                      },
+                      [_c("i", { staticClass: "fas fa-edit    " })]
+                    )
+                  ]),
+                  _vm._v(" "),
+                  _c("td", [
+                    _c(
+                      "a",
+                      {
+                        staticClass: "btn btn-danger btn-sm",
+                        attrs: { href: "" },
+                        on: {
+                          click: function($event) {
+                            $event.preventDefault()
+                            return _vm.deleteLoanType(loantype.id)
+                          }
+                        }
+                      },
+                      [_c("i", { staticClass: "fas fa-trash    " })]
+                    )
+                  ])
+                ])
+              }),
+              0
+            ),
+            _vm._v(" "),
+            _vm._m(2)
+          ])
+        ])
+      ])
+    ]),
+    _vm._v(" "),
+    _c(
+      "div",
+      {
+        staticClass: "modal fade",
+        attrs: {
+          id: "loan-type-modal",
+          tabindex: "-1",
+          role: "dialog",
+          "aria-labelledby": "modelTitleId",
+          "aria-hidden": "true"
+        }
+      },
+      [
+        _c(
+          "div",
+          { staticClass: "modal-dialog modal-lg", attrs: { role: "document" } },
+          [
+            _c("div", { staticClass: "modal-content" }, [
+              _c("div", { staticClass: "modal-header" }, [
+                _c(
+                  "h5",
+                  {
+                    directives: [
+                      {
+                        name: "show",
+                        rawName: "v-show",
+                        value: !_vm.isUpdating,
+                        expression: "!isUpdating"
+                      }
+                    ],
+                    staticClass: "modal-title indigo"
+                  },
+                  [
+                    _c("i", {
+                      staticClass: "fa fa-plus",
+                      attrs: { "aria-hidden": "true" }
+                    }),
+                    _vm._v(" "),
+                    _c("strong", [_vm._v("Add Loan Type")])
+                  ]
+                ),
+                _vm._v(" "),
+                _c(
+                  "h5",
+                  {
+                    directives: [
+                      {
+                        name: "show",
+                        rawName: "v-show",
+                        value: _vm.isUpdating,
+                        expression: "isUpdating"
+                      }
+                    ],
+                    staticClass: "modal-title indigo"
+                  },
+                  [
+                    _c("i", { staticClass: "fas fa-edit    " }),
+                    _vm._v(" "),
+                    _c("strong", [_vm._v("Update Loan Type")])
+                  ]
+                ),
+                _vm._v(" "),
+                _vm._m(3)
+              ]),
+              _vm._v(" "),
+              _c(
+                "form",
+                {
+                  on: {
+                    submit: function($event) {
+                      $event.preventDefault()
+                      _vm.isUpdating ? _vm.updateLoanType() : _vm.addLoanType()
+                    }
+                  }
+                },
+                [
+                  _c("div", { staticClass: "modal-body" }, [
+                    _c("div", { staticClass: "container-fluid" }, [
+                      _c("div", { staticClass: "row" }, [
+                        _c("div", { staticClass: "col-md-6" }, [
+                          _c("div", { staticClass: "form-group" }, [
+                            _c("label", [_vm._v("Loan type")]),
+                            _vm._v(" "),
+                            _c(
+                              "div",
+                              { staticClass: "input-group mb-3" },
+                              [
+                                _vm._m(4),
+                                _vm._v(" "),
+                                _c("input", {
+                                  directives: [
+                                    {
+                                      name: "model",
+                                      rawName: "v-model",
+                                      value: _vm.form.type,
+                                      expression: "form.type"
+                                    }
+                                  ],
+                                  staticClass: "form-control",
+                                  class: {
+                                    "is-invalid": _vm.form.errors.has("type")
+                                  },
+                                  attrs: { type: "text", name: "type" },
+                                  domProps: { value: _vm.form.type },
+                                  on: {
+                                    input: function($event) {
+                                      if ($event.target.composing) {
+                                        return
+                                      }
+                                      _vm.$set(
+                                        _vm.form,
+                                        "type",
+                                        $event.target.value
+                                      )
+                                    }
+                                  }
+                                }),
+                                _vm._v(" "),
+                                _c("has-error", {
+                                  attrs: { form: _vm.form, field: "type" }
+                                })
+                              ],
+                              1
+                            ),
+                            _vm._v(" "),
+                            _c("div", { staticClass: "form-group" }, [
+                              _c("label", [_vm._v("Interest")]),
+                              _vm._v(" "),
+                              _c(
+                                "div",
+                                { staticClass: "input-group mb-3" },
+                                [
+                                  _vm._m(5),
+                                  _vm._v(" "),
+                                  _c("input", {
+                                    directives: [
+                                      {
+                                        name: "model",
+                                        rawName: "v-model",
+                                        value: _vm.form.interest,
+                                        expression: "form.interest"
+                                      }
+                                    ],
+                                    staticClass: "form-control",
+                                    class: {
+                                      "is-invalid": _vm.form.errors.has(
+                                        "interest"
+                                      )
+                                    },
+                                    attrs: { type: "text", name: "interest" },
+                                    domProps: { value: _vm.form.interest },
+                                    on: {
+                                      input: function($event) {
+                                        if ($event.target.composing) {
+                                          return
+                                        }
+                                        _vm.$set(
+                                          _vm.form,
+                                          "interest",
+                                          $event.target.value
+                                        )
+                                      }
+                                    }
+                                  }),
+                                  _vm._v(" "),
+                                  _c("has-error", {
+                                    attrs: { form: _vm.form, field: "interest" }
+                                  })
+                                ],
+                                1
+                              )
+                            ])
+                          ])
+                        ]),
+                        _vm._v(" "),
+                        _c("div", { staticClass: "col-md-6" }, [
+                          _c("div", { staticClass: "form-group" }, [
+                            _c("label", [_vm._v("Max Amount")]),
+                            _vm._v(" "),
+                            _c(
+                              "div",
+                              { staticClass: "input-group mb-3" },
+                              [
+                                _vm._m(6),
+                                _vm._v(" "),
+                                _c("input", {
+                                  directives: [
+                                    {
+                                      name: "model",
+                                      rawName: "v-model",
+                                      value: _vm.form.max_amount,
+                                      expression: "form.max_amount"
+                                    }
+                                  ],
+                                  staticClass: "form-control",
+                                  class: {
+                                    "is-invalid": _vm.form.errors.has(
+                                      "max_amount"
+                                    )
+                                  },
+                                  attrs: { type: "text", name: "max_amount" },
+                                  domProps: { value: _vm.form.max_amount },
+                                  on: {
+                                    input: function($event) {
+                                      if ($event.target.composing) {
+                                        return
+                                      }
+                                      _vm.$set(
+                                        _vm.form,
+                                        "max_amount",
+                                        $event.target.value
+                                      )
+                                    }
+                                  }
+                                }),
+                                _vm._v(" "),
+                                _c("has-error", {
+                                  attrs: { form: _vm.form, field: "max_amount" }
+                                })
+                              ],
+                              1
+                            )
+                          ]),
+                          _vm._v(" "),
+                          _c("div", { staticClass: "form-group" }, [
+                            _c("label", [_vm._v("Max period")]),
+                            _vm._v(" "),
+                            _c(
+                              "div",
+                              { staticClass: "input-group mb-3" },
+                              [
+                                _vm._m(7),
+                                _vm._v(" "),
+                                _c("input", {
+                                  directives: [
+                                    {
+                                      name: "model",
+                                      rawName: "v-model",
+                                      value: _vm.form.max_period,
+                                      expression: "form.max_period"
+                                    }
+                                  ],
+                                  staticClass: "form-control",
+                                  class: {
+                                    "is-invalid": _vm.form.errors.has(
+                                      "max_period"
+                                    )
+                                  },
+                                  attrs: { type: "text", name: "max_period" },
+                                  domProps: { value: _vm.form.max_period },
+                                  on: {
+                                    input: function($event) {
+                                      if ($event.target.composing) {
+                                        return
+                                      }
+                                      _vm.$set(
+                                        _vm.form,
+                                        "max_period",
+                                        $event.target.value
+                                      )
+                                    }
+                                  }
+                                }),
+                                _vm._v(" "),
+                                _c("has-error", {
+                                  attrs: { form: _vm.form, field: "max_period" }
+                                })
+                              ],
+                              1
+                            )
+                          ])
+                        ])
+                      ])
+                    ])
+                  ]),
+                  _vm._v(" "),
+                  _c("div", { staticClass: "modal-footer" }, [
+                    _c(
+                      "button",
+                      {
+                        staticClass: "btn btn-danger",
+                        attrs: { type: "button", "data-dismiss": "modal" }
+                      },
+                      [_vm._v("Close")]
+                    ),
+                    _vm._v(" "),
+                    _c(
+                      "button",
+                      {
+                        directives: [
+                          {
+                            name: "show",
+                            rawName: "v-show",
+                            value: !_vm.isUpdating,
+                            expression: "!isUpdating"
+                          }
+                        ],
+                        staticClass: "btn btn-primary",
+                        attrs: { type: "submit" }
+                      },
+                      [_vm._v("Save")]
+                    ),
+                    _vm._v(" "),
+                    _c(
+                      "button",
+                      {
+                        directives: [
+                          {
+                            name: "show",
+                            rawName: "v-show",
+                            value: _vm.isUpdating,
+                            expression: "isUpdating"
+                          }
+                        ],
+                        staticClass: "btn btn-primary",
+                        attrs: { type: "submit" }
+                      },
+                      [_vm._v("Update")]
+                    )
+                  ])
+                ]
+              )
+            ])
+          ]
+        )
+      ]
+    )
+  ])
+}
+var staticRenderFns = [
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("h4", { staticClass: "card-title indigo" }, [
+      _c("i", { staticClass: "fas mr-2 fa-chart-pie    " }),
+      _c("strong", [_vm._v("Loan Types")])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("thead", [
+      _c("th", [_vm._v("#")]),
+      _vm._v(" "),
+      _c("th", [_vm._v("Type")]),
+      _vm._v(" "),
+      _c("th", [_vm._v("Max Interest")]),
+      _vm._v(" "),
+      _c("th", [_vm._v("Max Duration")]),
+      _vm._v(" "),
+      _c("th", [_vm._v("Max Amount")]),
+      _vm._v(" "),
+      _c("th", [_vm._v("Update")]),
+      _vm._v(" "),
+      _c("th", [_vm._v("Delete")])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("tfoot", [
+      _c("th", [_vm._v("#")]),
+      _vm._v(" "),
+      _c("th", [_vm._v("Type")]),
+      _vm._v(" "),
+      _c("th", [_vm._v("Max Interest")]),
+      _vm._v(" "),
+      _c("th", [_vm._v("Max Duration")]),
+      _vm._v(" "),
+      _c("th", [_vm._v("Max Amount")]),
+      _vm._v(" "),
+      _c("th", [_vm._v("Update")]),
+      _vm._v(" "),
+      _c("th", [_vm._v("Delete")])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c(
+      "button",
+      {
+        staticClass: "close",
+        attrs: {
+          type: "button",
+          "data-dismiss": "modal",
+          "aria-label": "Close"
+        }
+      },
+      [_c("span", { attrs: { "aria-hidden": "true" } }, [_vm._v("×")])]
+    )
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "input-group-prepend" }, [
+      _c(
+        "span",
+        { staticClass: "input-group-text", attrs: { id: "basic-addon1" } },
+        [_c("i", { staticClass: " indigo fab fa-first-order    " })]
+      )
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "input-group-prepend" }, [
+      _c(
+        "span",
+        { staticClass: "input-group-text", attrs: { id: "basic-addon1" } },
+        [_c("i", { staticClass: " indigo fab fa-first-order    " })]
+      )
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "input-group-prepend" }, [
+      _c(
+        "span",
+        { staticClass: "input-group-text", attrs: { id: "basic-addon1" } },
+        [_c("i", { staticClass: " indigo fab fa-first-order    " })]
+      )
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "input-group-prepend" }, [
+      _c(
+        "span",
+        { staticClass: "input-group-text", attrs: { id: "basic-addon1" } },
+        [_c("i", { staticClass: " indigo fab fa-first-order    " })]
+      )
     ])
   }
 ]
@@ -105044,13 +106256,21 @@ var render = function() {
                   _vm._v(" "),
                   _c("td", [_vm._v(_vm._s(transaction.transactionID))]),
                   _vm._v(" "),
-                  _c("td", [_vm._v(_vm._s(transaction.amount))]),
+                  _c("td", [
+                    _vm._v(_vm._s(_vm._f("formatMoney")(transaction.amount)))
+                  ]),
                   _vm._v(" "),
                   _c("td", [_vm._v(_vm._s(transaction.user))]),
                   _vm._v(" "),
-                  _c("td", [_vm._v(_vm._s(transaction.original_bal))]),
+                  _c("td", [
+                    _vm._v(
+                      _vm._s(_vm._f("formatMoney")(transaction.original_bal))
+                    )
+                  ]),
                   _vm._v(" "),
-                  _c("td", [_vm._v(_vm._s(transaction.new_bal))]),
+                  _c("td", [
+                    _vm._v(_vm._s(_vm._f("formatMoney")(transaction.new_bal)))
+                  ]),
                   _vm._v(" "),
                   _c("td", [
                     _vm._v(_vm._s(_vm._f("upDate")(transaction.created_at)))
@@ -105222,13 +106442,27 @@ var render = function() {
                       _vm._v(" "),
                       _c("td", [_vm._v(_vm._s(transaction.transactionID))]),
                       _vm._v(" "),
-                      _c("td", [_vm._v(_vm._s(transaction.amount))]),
+                      _c("td", [
+                        _vm._v(
+                          _vm._s(_vm._f("formatMoney")(transaction.amount))
+                        )
+                      ]),
                       _vm._v(" "),
                       _c("td", [_vm._v(_vm._s(transaction.user))]),
                       _vm._v(" "),
-                      _c("td", [_vm._v(_vm._s(transaction.original_bal))]),
+                      _c("td", [
+                        _vm._v(
+                          _vm._s(
+                            _vm._f("formatMoney")(transaction.original_bal)
+                          )
+                        )
+                      ]),
                       _vm._v(" "),
-                      _c("td", [_vm._v(_vm._s(transaction.new_bal))]),
+                      _c("td", [
+                        _vm._v(
+                          _vm._s(_vm._f("formatMoney")(transaction.new_bal))
+                        )
+                      ]),
                       _vm._v(" "),
                       _c("td", [
                         _vm._v(_vm._s(_vm._f("upDate")(transaction.created_at)))
@@ -122523,6 +123757,27 @@ Vue.filter('upDate', function (myDate) {
 Vue.filter('time', function (time) {
   return moment__WEBPACK_IMPORTED_MODULE_1___default()(time).calendar();
 });
+Vue.filter('formatMoney', function (moneyString) {
+  if (parseFloat(moneyString) || parseFloat(moneyString) === 0) {
+    var money = parseFloat(moneyString).toFixed(2);
+    var moneyArray = money.toString().split('.');
+    var integer = moneyArray[0];
+    var decimal = moneyArray[1];
+    var finalString = '';
+
+    for (var i = integer.length - 1; i >= 0; i--) {
+      finalString = integer[i] + finalString;
+
+      if (integer.substr(i).length % 3 == 0 && i != 0) {
+        finalString = ',' + finalString;
+      }
+    }
+
+    return "".concat(finalString, ".").concat(decimal);
+  }
+
+  return moneyString;
+});
 
 Vue.use(vue_progressbar__WEBPACK_IMPORTED_MODULE_3___default.a, {
   color: 'rgb(143, 255, 199)',
@@ -122605,6 +123860,16 @@ var routes = [{
 {
   path: '/reviews',
   component: __webpack_require__(/*! ./components/Review/reviews.vue */ "./resources/js/components/Review/reviews.vue")["default"]
+},
+/*  Investments */
+{
+  path: '/investments',
+  component: __webpack_require__(/*! ./components/Investment/investments.vue */ "./resources/js/components/Investment/investments.vue")["default"]
+},
+/*  Loan Types */
+{
+  path: '/loantypes',
+  component: __webpack_require__(/*! ./components/LoanTypes/loan_types.vue */ "./resources/js/components/LoanTypes/loan_types.vue")["default"]
 }];
 var router = new vue_router__WEBPACK_IMPORTED_MODULE_4__["default"]({
   mode: 'history',
@@ -123106,6 +124371,75 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
+/***/ "./resources/js/components/Investment/investments.vue":
+/*!************************************************************!*\
+  !*** ./resources/js/components/Investment/investments.vue ***!
+  \************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _investments_vue_vue_type_template_id_b6178e22___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./investments.vue?vue&type=template&id=b6178e22& */ "./resources/js/components/Investment/investments.vue?vue&type=template&id=b6178e22&");
+/* harmony import */ var _investments_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./investments.vue?vue&type=script&lang=js& */ "./resources/js/components/Investment/investments.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport *//* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+
+
+
+
+
+/* normalize component */
+
+var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
+  _investments_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
+  _investments_vue_vue_type_template_id_b6178e22___WEBPACK_IMPORTED_MODULE_0__["render"],
+  _investments_vue_vue_type_template_id_b6178e22___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"],
+  false,
+  null,
+  null,
+  null
+  
+)
+
+/* hot reload */
+if (false) { var api; }
+component.options.__file = "resources/js/components/Investment/investments.vue"
+/* harmony default export */ __webpack_exports__["default"] = (component.exports);
+
+/***/ }),
+
+/***/ "./resources/js/components/Investment/investments.vue?vue&type=script&lang=js&":
+/*!*************************************************************************************!*\
+  !*** ./resources/js/components/Investment/investments.vue?vue&type=script&lang=js& ***!
+  \*************************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_investments_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/babel-loader/lib??ref--4-0!../../../../node_modules/vue-loader/lib??vue-loader-options!./investments.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/Investment/investments.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport */ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_investments_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"]); 
+
+/***/ }),
+
+/***/ "./resources/js/components/Investment/investments.vue?vue&type=template&id=b6178e22&":
+/*!*******************************************************************************************!*\
+  !*** ./resources/js/components/Investment/investments.vue?vue&type=template&id=b6178e22& ***!
+  \*******************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_investments_vue_vue_type_template_id_b6178e22___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../../node_modules/vue-loader/lib??vue-loader-options!./investments.vue?vue&type=template&id=b6178e22& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/Investment/investments.vue?vue&type=template&id=b6178e22&");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_investments_vue_vue_type_template_id_b6178e22___WEBPACK_IMPORTED_MODULE_0__["render"]; });
+
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_investments_vue_vue_type_template_id_b6178e22___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
+
+
+
+/***/ }),
+
 /***/ "./resources/js/components/LineCharts.js":
 /*!***********************************************!*\
   !*** ./resources/js/components/LineCharts.js ***!
@@ -123333,6 +124667,75 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_loans_vue_vue_type_template_id_63022a4f___WEBPACK_IMPORTED_MODULE_0__["render"]; });
 
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_loans_vue_vue_type_template_id_63022a4f___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
+
+
+
+/***/ }),
+
+/***/ "./resources/js/components/LoanTypes/loan_types.vue":
+/*!**********************************************************!*\
+  !*** ./resources/js/components/LoanTypes/loan_types.vue ***!
+  \**********************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _loan_types_vue_vue_type_template_id_d68d3c8a___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./loan_types.vue?vue&type=template&id=d68d3c8a& */ "./resources/js/components/LoanTypes/loan_types.vue?vue&type=template&id=d68d3c8a&");
+/* harmony import */ var _loan_types_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./loan_types.vue?vue&type=script&lang=js& */ "./resources/js/components/LoanTypes/loan_types.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport *//* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+
+
+
+
+
+/* normalize component */
+
+var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
+  _loan_types_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
+  _loan_types_vue_vue_type_template_id_d68d3c8a___WEBPACK_IMPORTED_MODULE_0__["render"],
+  _loan_types_vue_vue_type_template_id_d68d3c8a___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"],
+  false,
+  null,
+  null,
+  null
+  
+)
+
+/* hot reload */
+if (false) { var api; }
+component.options.__file = "resources/js/components/LoanTypes/loan_types.vue"
+/* harmony default export */ __webpack_exports__["default"] = (component.exports);
+
+/***/ }),
+
+/***/ "./resources/js/components/LoanTypes/loan_types.vue?vue&type=script&lang=js&":
+/*!***********************************************************************************!*\
+  !*** ./resources/js/components/LoanTypes/loan_types.vue?vue&type=script&lang=js& ***!
+  \***********************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_loan_types_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/babel-loader/lib??ref--4-0!../../../../node_modules/vue-loader/lib??vue-loader-options!./loan_types.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/LoanTypes/loan_types.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport */ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_loan_types_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"]); 
+
+/***/ }),
+
+/***/ "./resources/js/components/LoanTypes/loan_types.vue?vue&type=template&id=d68d3c8a&":
+/*!*****************************************************************************************!*\
+  !*** ./resources/js/components/LoanTypes/loan_types.vue?vue&type=template&id=d68d3c8a& ***!
+  \*****************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_loan_types_vue_vue_type_template_id_d68d3c8a___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../../node_modules/vue-loader/lib??vue-loader-options!./loan_types.vue?vue&type=template&id=d68d3c8a& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/LoanTypes/loan_types.vue?vue&type=template&id=d68d3c8a&");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_loan_types_vue_vue_type_template_id_d68d3c8a___WEBPACK_IMPORTED_MODULE_0__["render"]; });
+
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_loan_types_vue_vue_type_template_id_d68d3c8a___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
 
 
 

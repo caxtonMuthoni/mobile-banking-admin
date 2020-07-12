@@ -21,6 +21,13 @@ class TransactionController extends Controller
         return $transactions;
     }
 
+    // User get transactions
+    public function getUserTransaction(){
+        $userid = auth('api')->user()->id;
+        $transactions = Transaction::where('UserId',$userid)->latest()->get();
+        return TransactionCollection::collection($transactions);
+    }
+
     public function userTransactions(Request $request){
         $this->validate($request,[
             "MSISDN"=>"required | max:10 | min:10 | regex:/(07)[0-9]{8}/",
@@ -92,15 +99,18 @@ class TransactionController extends Controller
 
             
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Transaction  $transaction
-     * @return \Illuminate\Http\Response
-     */
-    public function show(Transaction $transaction)
+    /* ========================= Get individual user contribution ========================= */
+    public function showUserTransactions(Request $request)
     {
-        //
+        //validation
+        $this->validate($request,[
+           'userId' => 'required | numeric',
+           'AccountNumber' => 'required | numeric'
+        ]);
+
+        $transactions = Transaction::where([['AccountNumber',$request->AccountNumber],['UserId',$request->userId]])->latest()->get();
+
+        return TransactionCollection::collection($transactions);
     }
 
     /**

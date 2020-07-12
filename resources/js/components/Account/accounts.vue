@@ -23,7 +23,7 @@
                                   <td>{{account.id}}</td>
                                   <td>{{account.AccountNumber}}</td>
                                   <td>{{account.AccountName}}</td>
-                                  <td>{{account.CurrentBalance}}</td>
+                                  <td>{{account.CurrentBalance | formatMoney}}</td>
                                   <td v-show="account.Status"><p  class="badge badge-success">Active</p></td>
                                   <td v-show="!account.Status"><p  class="badge badge-danger">Closed</p></td>
                                   <td><button @click.prevent="deposit(account)" class="btn btn-primary"><i class="fas fa-money-bill-wave    "></i> Deposit</button></td>
